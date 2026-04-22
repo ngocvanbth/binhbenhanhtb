@@ -316,62 +316,79 @@
         </div>
     </div>
 
-    <script>
-        let slideHienTai = 0;
-        let danhSachSlide = [];
-        let trangThaiDaLuu = false; 
-        let maHoSoHienTai = "";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+
+        // CẤU HÌNH FIREBASE CỦA ANH
+        const firebaseConfig = {
+            apiKey: "AIzaSyB89PLFWQWiJZ3KLCY4l1rw0t9QK-JtimY",
+            authDomain: "binhbenhanhtb.firebaseapp.com",
+            databaseURL: "https://binhbenhanhtb-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "binhbenhanhtb",
+            storageBucket: "binhbenhanhtb.firebasestorage.app",
+            messagingSenderId: "755374522439",
+            appId: "1:755374522439:web:0235e74c65067da7bf3162",
+            measurementId: "G-JTC6F5KE82"
+        };
+
+        // KHỞI TẠO FIREBASE
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // BIẾN TOÀN CỤC (Gắn vào window để giao diện HTML gọi được)
+        window.slideHienTai = 0;
+        window.danhSachSlide = [];
+        window.trangThaiDaLuu = false; 
+        window.maHoSoHienTai = "";
+        window.duLieuTamThoi = []; // Chứa dữ liệu tải từ server về
 
         // --- ĐĂNG NHẬP & ĐIỀU HƯỚNG ---
-        function xuLyDangNhap() {
+        window.xuLyDangNhap = function() {
             document.getElementById("khu-vuc-dang-nhap").style.display = "none";
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
         }
-        function vaoFormNhapLieu(loai) {
+        window.vaoFormNhapLieu = function(loai) {
             if(loai === 'Đơn thuốc') { alert("Tính năng đang phát triển!"); return; }
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "none";
             document.getElementById("khu-vuc-nhap-lieu").style.display = "block";
         }
-        function dangXuat() { location.reload(); }
+        window.dangXuat = function() { location.reload(); }
 
-        function docFileHTMLHoso(event) {
+        window.docFileHTMLHoso = function(event) {
             let file = event.target.files[0];
             if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(e) {
-                alert("✅ Đã đọc file HTML thành công!");
-            };
-            reader.readAsText(file);
+            alert("✅ Tính năng bóc tách HTML đang chờ cấu trúc từ Bệnh viện!");
         }
 
         // --- LOGIC THÊM ĐỘNG ---
-        function xoaDong(btn) { btn.parentElement.remove(); }
-        function themDongAnh() {
+        window.xoaDong = function(btn) { btn.parentElement.remove(); }
+        window.themDongAnh = function() {
             let div = document.createElement("div"); div.className = "dynamic-row row-anh";
             div.innerHTML = `<div style="flex: 1;"><input type="file" class="file-anh" accept="image/*"></div><div style="flex: 2;"><input type="text" class="txt-ghichu" placeholder="Nhập ghi chú cho hình này..."></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
             document.getElementById("danh-sach-anh").appendChild(div);
         }
-        function themDongDienBien() {
+        window.themDongDienBien = function() {
             let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
             div.innerHTML = `<div style="flex: 1;"><input type="text" class="db-thoigian" placeholder="Thời gian..."></div><div style="flex: 2;"><textarea class="db-dienbien" rows="3" placeholder="Diễn biến..."></textarea></div><div style="flex: 2;"><textarea class="db-xutri" rows="3" placeholder="Xử trí..."></textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
             document.getElementById("danh-sach-dien-bien").appendChild(div);
         }
 
-        // --- LƯU, XÓA & TÌM KIẾM ---
-        function capNhatTieuDeBenh() {
+        // --- LƯU LÊN FIREBASE ---
+        window.capNhatTieuDeBenh = function() {
             let val = document.getElementById("in-ten-benh").value;
             document.getElementById("hien-thi-ten-benh").innerText = val ? "TÊN BỆNH: " + val.toUpperCase() : "TÊN BỆNH: ..........................";
-            trangThaiDaLuu = false; 
+            window.trangThaiDaLuu = false; 
         }
 
-        function xuLyLuuBenhAn() {
+        window.xuLyLuuBenhAn = function() {
             let tenBenh = document.getElementById("in-ten-benh").value.trim();
             let matKhau = document.getElementById("in-mat-khau").value.trim();
             
             if(!tenBenh) { alert("Vui lòng nhập Tên bệnh/Chẩn đoán!"); document.getElementById("in-ten-benh").focus(); return; }
-            if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm hồ sơ của bạn!"); document.getElementById("in-mat-khau").focus(); return; }
+            if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm!"); document.getElementById("in-mat-khau").focus(); return; }
 
-            if(!maHoSoHienTai) maHoSoHienTai = "BA-" + new Date().getTime().toString().slice(-6);
+            if(!window.maHoSoHienTai) window.maHoSoHienTai = "BA-" + new Date().getTime().toString().slice(-6);
 
             let arrDienBien = [];
             document.querySelectorAll(".row-dienbien").forEach(row => {
@@ -383,7 +400,7 @@
             });
 
             let duLieu = {
-                id: maHoSoHienTai, khoa: document.getElementById("in-khoa").value, matKhau: matKhau, tenBenh: tenBenh,
+                id: window.maHoSoHienTai, khoa: document.getElementById("in-khoa").value, matKhau: matKhau, tenBenh: tenBenh,
                 nguoiTrinhBay: document.getElementById("in-nguoi-trinh-bay").value,
                 tenBN: document.getElementById("in-ten").value, tuoi: document.getElementById("in-tuoi").value,
                 nghe: document.getElementById("in-nghe").value, diaChi: document.getElementById("in-diachi").value,
@@ -391,72 +408,86 @@
                 tienSu: document.getElementById("in-tiensu").value, khamChung: document.getElementById("in-khamchung").value,
                 clsText: document.getElementById("in-cls-text").value, tomtat: document.getElementById("in-tomtat").value,
                 chandoan: document.getElementById("in-chandoan").value, banluan: document.getElementById("in-banluan").value,
-                dienBienList: arrDienBien
+                dienBienList: arrDienBien,
+                ngayTao: new Date().toLocaleString('vi-VN')
             };
 
-            let db = JSON.parse(localStorage.getItem('DataBA') || '[]');
-            let index = db.findIndex(x => x.id === maHoSoHienTai);
-            if(index > -1) db[index] = duLieu; else db.push(duLieu);
-            localStorage.setItem('DataBA', JSON.stringify(db));
-
-            document.getElementById("modal-ma-ba").innerText = maHoSoHienTai;
-            document.getElementById("modal-luu").style.display = "flex";
-            trangThaiDaLuu = true; 
+            // ĐẨY LÊN FIREBASE
+            set(ref(db, 'DanhSachBenhAn/' + window.maHoSoHienTai), duLieu)
+                .then(() => {
+                    document.getElementById("modal-ma-ba").innerText = window.maHoSoHienTai;
+                    document.getElementById("modal-luu").style.display = "flex";
+                    window.trangThaiDaLuu = true; 
+                })
+                .catch((error) => {
+                    alert("❌ Lỗi khi lưu lên máy chủ: " + error.message);
+                });
         }
 
-        function moModalTimKiem() {
-            let db = JSON.parse(localStorage.getItem('DataBA') || '[]');
-            let h = db.length ? "" : "<p style='text-align:center;'>Chưa có bệnh án nào được lưu.</p>";
-            
-            db.reverse().forEach(ba => {
-                h += `
-                <div class="search-item">
-                    <div class="search-item-info" onclick="taiDuLieu('${ba.id}')">
-                        <strong>${ba.id}</strong> - ${ba.tenBenh} <br>
-                        <span style="font-size: 14px; color: #64748b;">${ba.khoa} | Người trình bày: ${ba.nguoiTrinhBay}</span>
-                    </div>
-                    <button class="btn-delete-ba" onclick="xoaBenhAn('${ba.id}', event)">🗑️ Xóa</button>
-                </div>`;
-            });
-            document.getElementById("danh-sach-kq").innerHTML = h;
+        // --- TÌM KIẾM TRÊN FIREBASE ---
+        window.moModalTimKiem = function() {
+            document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center; color:#0284c7;'>⏳ Đang tải dữ liệu từ máy chủ...</p>";
             document.getElementById("modal-tim-kiem").style.display = "flex";
+
+            const dbRef = ref(db);
+            get(child(dbRef, `DanhSachBenhAn`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let data = snapshot.val();
+                    // Chuyển Object của Firebase thành Array để đảo ngược
+                    window.duLieuTamThoi = Object.values(data);
+                    
+                    let h = "";
+                    window.duLieuTamThoi.reverse().forEach(ba => {
+                        h += `
+                        <div class="search-item">
+                            <div class="search-item-info" onclick="taiDuLieu('${ba.id}')">
+                                <strong>${ba.id}</strong> - ${ba.tenBenh} <br>
+                                <span style="font-size: 14px; color: #64748b;">${ba.khoa} | BS: ${ba.nguoiTrinhBay} | Lưu lúc: ${ba.ngayTao || ''}</span>
+                            </div>
+                            <button class="btn-delete-ba" onclick="xoaBenhAn('${ba.id}', event)">🗑️ Xóa</button>
+                        </div>`;
+                    });
+                    document.getElementById("danh-sach-kq").innerHTML = h;
+                } else {
+                    document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center;'>Chưa có bệnh án nào trên hệ thống.</p>";
+                }
+            }).catch((error) => {
+                document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center; color:red;'>Lỗi kết nối máy chủ!</p>";
+            });
         }
 
-        // --- MỚI: HÀM XÓA BỆNH ÁN CÓ BẢO VỆ MẬT KHẨU ---
-        function xoaBenhAn(id, event) {
-            event.stopPropagation(); // Ngăn chặn bấm nhầm sang phần tải dữ liệu
+        // --- XÓA TRÊN FIREBASE ---
+        window.xoaBenhAn = function(id, event) {
+            event.stopPropagation(); 
 
-            let db = JSON.parse(localStorage.getItem('DataBA') || '[]');
-            let ba = db.find(x => x.id === id);
+            let ba = window.duLieuTamThoi.find(x => x.id === id);
             if(!ba) return;
 
-            // Kiểm tra mật khẩu (nếu bệnh án có cài mật khẩu)
             if(ba.matKhau) {
-                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.\nVui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa:`);
-                if(mkNhap === null) return; // Người dùng bấm Hủy
+                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.\nVui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:`);
+                if(mkNhap === null) return; 
                 if(mkNhap !== ba.matKhau) {
                     alert("❌ MẬT KHẨU KHÔNG ĐÚNG! Bạn không có quyền xóa hồ sơ này.");
                     return;
                 }
             }
 
-            // Xác nhận lần cuối
-            let xacNhan = confirm(`⚠️ Mật khẩu hợp lệ. Bạn có chắc chắn XÓA VĨNH VIỄN hồ sơ [${id}] không?`);
+            let xacNhan = confirm(`⚠️ Bạn có chắc chắn XÓA VĨNH VIỄN hồ sơ [${id}] khỏi hệ thống trực tuyến không?`);
             if(xacNhan) {
-                db = db.filter(x => x.id !== id);
-                localStorage.setItem('DataBA', JSON.stringify(db));
-                
-                // Nếu hồ sơ đang mở trên form bị xóa thì reset mã
-                if(maHoSoHienTai === id) maHoSoHienTai = "";
-                
-                moModalTimKiem(); // Làm mới danh sách
+                remove(ref(db, 'DanhSachBenhAn/' + id))
+                    .then(() => {
+                        alert("Đã xóa hồ sơ thành công!");
+                        if(window.maHoSoHienTai === id) window.maHoSoHienTai = "";
+                        window.moModalTimKiem(); // Cập nhật lại danh sách
+                    })
+                    .catch((error) => { alert("Lỗi xóa dữ liệu: " + error.message); });
             }
         }
 
-        function taiDuLieu(id) {
-            let ba = JSON.parse(localStorage.getItem('DataBA') || '[]').find(x => x.id === id);
+        window.taiDuLieu = function(id) {
+            let ba = window.duLieuTamThoi.find(x => x.id === id);
             if(ba) {
-                maHoSoHienTai = ba.id;
+                window.maHoSoHienTai = ba.id;
                 document.getElementById("in-khoa").value = ba.khoa;
                 document.getElementById("in-mat-khau").value = ba.matKhau || "";
                 document.getElementById("in-ten-benh").value = ba.tenBenh;
@@ -475,24 +506,24 @@
                 document.getElementById("in-banluan").value = ba.banluan;
 
                 document.getElementById("danh-sach-dien-bien").innerHTML = "";
-                ba.dienBienList.forEach(item => {
-                    let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                    div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
-                    document.getElementById("danh-sach-dien-bien").appendChild(div);
-                });
+                if(ba.dienBienList) {
+                    ba.dienBienList.forEach(item => {
+                        let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+                        div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                        document.getElementById("danh-sach-dien-bien").appendChild(div);
+                    });
+                }
 
-                capNhatTieuDeBenh(); trangThaiDaLuu = true; 
+                window.capNhatTieuDeBenh(); window.trangThaiDaLuu = true; 
                 document.getElementById("modal-tim-kiem").style.display = "none";
             }
         }
 
         // --- TRÌNH CHIẾU NÂNG CAO ---
-        async function batDauTrinhChieu() {
-            if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU BỆNH ÁN!"); return; }
+        window.batDauTrinhChieu = async function() {
+            if(!window.trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU BỆNH ÁN LÊN HỆ THỐNG!"); return; }
 
-            // Truyền tên Khoa ra Slide Welcome
             document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa").value;
-
             document.getElementById("out-ten-benh").innerText = document.getElementById("in-ten-benh").value;
             document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay").value;
             document.getElementById("out-ten").innerText = document.getElementById("in-ten").value;
@@ -513,18 +544,13 @@
                 let tg = row.querySelector('.db-thoigian').value;
                 let db = row.querySelector('.db-dienbien').value.replace(/\n/g, "<br>");
                 let xt = row.querySelector('.db-xutri').value.replace(/\n/g, "<br>");
-                if(tg || db || xt) {
-                    htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
-                }
+                if(tg || db || xt) htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
             });
             htmlBang += `</table>`;
             document.getElementById("out-bang-dienbien").innerHTML = htmlBang;
 
             document.querySelectorAll('.slide-anh-dong').forEach(e => e.remove());
             let anhRows = document.querySelectorAll('.row-anh');
-            
-            // Vị trí chèn ảnh thay đổi vì đã có thêm 1 trang Welcome ở đầu. 
-            // 0: Welcome, 1: Hành chính, 2: Bệnh sử, 3: Khám LS, 4: Cận LS -> Ảnh sẽ nằm ở vị trí số 5
             let slideIndexInsert = 5; 
             let container = document.getElementById("slide-container");
 
@@ -559,37 +585,38 @@
             document.getElementById("khu-vuc-trinh-chieu").style.display = "block";
             let elem = document.documentElement; if (elem.requestFullscreen) elem.requestFullscreen();
 
-            danhSachSlide = document.getElementsByClassName("slide"); 
-            // Luôn luôn bắt đầu từ Slide 0 (Trang Chào mừng)
-            slideHienTai = 0;
-            hienThiSlide(slideHienTai);
+            window.danhSachSlide = document.getElementsByClassName("slide"); 
+            window.slideHienTai = 0;
+            window.hienThiSlide(window.slideHienTai);
         }
 
-        function ketThucTrinhChieu() {
+        window.ketThucTrinhChieu = function() {
             document.getElementById("khu-vuc-trinh-chieu").style.display = "none";
             document.getElementById("khu-vuc-nhap-lieu").style.display = "block";
             if (document.exitFullscreen) document.exitFullscreen();
         }
 
-        function hienThiSlide(n) {
-            for (let i = 0; i < danhSachSlide.length; i++) danhSachSlide[i].classList.remove("active"); 
-            if(danhSachSlide[n]) danhSachSlide[n].classList.add("active"); 
+        window.hienThiSlide = function(n) {
+            for (let i = 0; i < window.danhSachSlide.length; i++) window.danhSachSlide[i].classList.remove("active"); 
+            if(window.danhSachSlide[n]) window.danhSachSlide[n].classList.add("active"); 
         }
 
-        function chuyenSlide(buoc) {
-            if (slideHienTai + buoc >= 0 && slideHienTai + buoc < danhSachSlide.length) {
-                slideHienTai += buoc;
-                hienThiSlide(slideHienTai);
+        window.chuyenSlide = function(buoc) {
+            if (window.slideHienTai + buoc >= 0 && window.slideHienTai + buoc < window.danhSachSlide.length) {
+                window.slideHienTai += buoc;
+                window.hienThiSlide(window.slideHienTai);
             }
         }
 
         document.addEventListener('keydown', function(event) {
             if (document.getElementById("khu-vuc-trinh-chieu").style.display === "block") {
-                if (event.key === "ArrowRight") chuyenSlide(1);
-                else if (event.key === "ArrowLeft") chuyenSlide(-1);
-                else if (event.key === "Escape") ketThucTrinhChieu();
+                if (event.key === "ArrowRight") window.chuyenSlide(1);
+                else if (event.key === "ArrowLeft") window.chuyenSlide(-1);
+                else if (event.key === "Escape") window.ketThucTrinhChieu();
             }
         });
     </script>
+</body>
+</html>
 </body>
 </html>
