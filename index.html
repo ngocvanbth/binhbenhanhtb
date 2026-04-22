@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ Thống Bình Bệnh Án - TTYT Hàm Thuận Bắc</title>
+    <style>
+        /* =========================================
+           1. THIẾT LẬP CƠ BẢN & MÀU SẮC
+        ========================================= */
+        :root { --primary-color: #0284c7; --success-color: #16a34a; --warning-color: #f59e0b; --bg-color: #e0f2fe; --card-bg: #ffffff; --text-color: #334155; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+
+        /* =========================================
+           2. ĐĂNG NHẬP & CHỌN CHỨC NĂNG
+        ========================================= */
+        .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background-image: url('logott.png'); background-position: center; background-size: 30%; background-repeat: no-repeat; background-blend-mode: overlay; background-color: rgba(224, 242, 254, 0.95); position: fixed; top: 0; left: 0; width: 100vw; z-index: 500; }
+        .auth-box { background: white; padding: 40px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--primary-color); }
+        .chuc-nang-container { max-width: 800px; margin: 80px auto; padding: 20px; }
+        .grid-chuc-nang { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        .chuc-nang-card { background: white; border-radius: 15px; padding: 50px 20px; text-align: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 3px solid transparent; transition: all 0.3s ease; }
+        .chuc-nang-card:hover { transform: translateY(-8px); border-color: var(--primary-color); box-shadow: 0 12px 25px rgba(2, 132, 199, 0.25); }
+        .chuc-nang-icon { font-size: 70px; margin-bottom: 20px; }
+        .chuc-nang-card h3 { color: var(--text-color); margin: 0; font-size: 22px; font-weight: bold; text-transform: uppercase;}
+
+        /* =========================================
+           3. FORM NHẬP LIỆU
+        ========================================= */
+        #khu-vuc-nhap-lieu { max-width: 950px; margin: 0 auto; }
+        h2 { text-align: center; color: var(--primary-color); font-size: 30px; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; }
+        .subtitle-benh { text-align: center; font-size: 22px; font-weight: bold; color: #dc2626; margin-bottom: 25px; }
+
+        .form-section { background-color: var(--card-bg); padding: 25px; margin-bottom: 25px; border-radius: 10px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
+        .form-section h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-size: 22px; font-weight: 800;}
+
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 800; margin-bottom: 8px; color: #475569; font-size: 16px;}
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 16px; background-color: #f8fafc; box-sizing: border-box; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        .highlight-input { border: 2px solid #dc2626 !important; background-color: #fef2f2 !important; font-weight: bold;}
+
+        .btn-add-row { background-color: #f1f5f9; color: var(--primary-color); border: 1px dashed var(--primary-color); padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px;}
+        .dynamic-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;}
+        .btn-delete-row { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+
+        .button-group { display: flex; gap: 10px; margin-bottom: 30px; }
+        button.btn-main { padding: 14px 15px; font-size: 16px; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; color: white; flex: 1; opacity: 1 !important; transition: all 0.2s;}
+        button.btn-main:hover { filter: brightness(0.9); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
+        .btn-success { background-color: var(--success-color); }
+        .btn-primary { background-color: var(--primary-color); }
+        .btn-warning { background-color: var(--warning-color); }
+        .btn-danger { background-color: #dc2626; }
+
+        /* =========================================
+           4. MODAL
+        ========================================= */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background-color: white; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .search-list { max-height: 300px; overflow-y: auto; margin-top: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 6px;}
+        .search-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px dashed #ccc; font-size: 16px; transition: background 0.2s;}
+        .search-item:hover { background-color: #f1f5f9; }
+        .search-item-info { flex: 1; cursor: pointer; }
+        .search-item-info strong { color: var(--primary-color); }
+        .btn-delete-ba { background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
+        .btn-delete-ba:hover { background-color: #dc2626; color: white; }
+
+        /* =========================================
+           5. KHU VỰC TRÌNH CHIẾU
+        ========================================= */
+        #khu-vuc-trinh-chieu { display: none; width: 100vw; height: 100vh; background-color: white; position: fixed; top: 0; left: 0; z-index: 1000; overflow: hidden; }
+        #khu-vuc-trinh-chieu::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vh; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.05; z-index: 1; pointer-events: none; }
+        
+        .logo-corner { position: absolute; top: 20px; left: 30px; width: 90px; height: 90px; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; z-index: 100; }
+        .presenter-box { position: absolute; top: 20px; right: 30px; display: flex; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid var(--primary-color); z-index: 100; animation: fadeInDown 0.8s ease-out forwards; }
+        .presenter-box img.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 1px solid #e2e8f0; }
+
+        .slide { display: none; height: 100%; padding: 40px 80px; box-sizing: border-box; }
+        .slide.active { display: block; animation: slideInRight 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
+        
+        .slide-header, .slide-content { position: relative; z-index: 10; }
+        
+        .slide-header { font-size: 55px; font-weight: 900; color: var(--primary-color); border-bottom: 4px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px; margin-left: 100px; margin-right: 250px; }
+        .slide-content { font-size: 40px; line-height: 1.5; color: #1e293b; padding-left: 20px;}
+        .slide-content p strong { font-weight: 900; color: var(--primary-color); }
+        .text-indent { padding-left: 40px; margin-top: 10px; color: #334155; }
+        
+        .slide-controls { position: absolute; bottom: 30px; right: 50px; display: flex; gap: 15px; z-index: 100; }
+        .slide-controls button { width: auto; font-size: 20px; padding: 12px 30px; color: var(--text-color); background-color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 800;}
+        .slide-controls button:hover { background-color: #cbd5e1; }
+
+        table.tb-dienbien { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 28px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        table.tb-dienbien th, table.tb-dienbien td { border: 2px solid #cbd5e1; padding: 15px; vertical-align: top; line-height: 1.5; }
+        table.tb-dienbien th { background-color: var(--primary-color); color: white; text-align: center; font-size: 32px; font-weight: 900; text-transform: uppercase;}
+        table.tb-dienbien td:nth-child(1) { width: 15%; font-weight: bold; text-align: center; color: #dc2626;} 
+        table.tb-dienbien td:nth-child(2) { width: 45%; text-align: left; } 
+        table.tb-dienbien td:nth-child(3) { width: 40%; text-align: left; } 
+
+        .slide-image-container { text-align: center; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; }
+        .slide-image-container img { max-height: 100%; max-width: 95%; border: 4px solid var(--primary-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); object-fit: contain; }
+        .slide-image-note { margin-top: 15px; font-size: 34px; color: #dc2626; font-style: italic; font-weight: 900; }
+
+        /* =========================================
+           6. CSS RIÊNG CHO SLIDE CHÀO MỪNG (WELCOME)
+        ========================================= */
+        .slide-welcome { display: flex; align-items: center; justify-content: center; text-align: center; height: 100%; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+        .welcome-content { animation: zoomIn 0.8s ease-out forwards; position: relative; z-index: 10;}
+        /* Hiệu ứng nhịp tim (pulsing) cho Logo */
+        .welcome-logo { width: 180px; margin-bottom: 20px; animation: heartbeat 2s infinite; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .welcome-title { font-size: 65px; color: var(--primary-color); font-weight: 900; margin: 0 0 15px 0; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .welcome-subtitle { font-size: 55px; color: #dc2626; font-weight: 900; margin: 0 0 30px 0; text-transform: uppercase; }
+        .welcome-divider { width: 150px; border: 4px solid var(--success-color); border-radius: 5px; margin: 0 auto 30px auto; }
+        .welcome-footer { font-size: 40px; color: var(--primary-color); font-weight: 800; margin: 0; letter-spacing: 2px; }
+
+        /* Các hoạt ảnh động */
+        @keyframes heartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.1); } 40% { transform: scale(1); } 60% { transform: scale(1.05); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slide.active .slide-content > p, .slide.active .slide-content > div, .slide.active .slide-content > table { opacity: 0; animation: fadeInUp 0.5s ease-out forwards; }
+        .slide.active .slide-content > p:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .slide-content > p:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .slide-content > p:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .slide-content > p:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .slide-content > table { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+    <div id="khu-vuc-dang-nhap" class="auth-container">
+        <div class="auth-box">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img src="logott.png" alt="Logo TTYT" style="width: 80px;">
+                <h2 style="color: var(--primary-color); margin-top: 10px; font-size: 26px;">HỆ THỐNG BÌNH BỆNH ÁN</h2>
+            </div>
+            <div class="form-group"><label>Tên đăng nhập:</label><input type="text" id="login-username" value="admin"></div>
+            <div class="form-group"><label>Mật khẩu:</label><input type="password" id="login-password" value="123456"></div>
+            <button onclick="xuLyDangNhap()" class="btn-main btn-primary" style="margin-bottom: 15px; width: 100%;">ĐĂNG NHẬP</button>
+        </div>
+    </div>
+
+    <div id="khu-vuc-chon-chuc-nang" class="chuc-nang-container" style="display: none;">
+        <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 40px; font-size: 30px;">CHỌN CHỨC NĂNG LÀM VIỆC</h2>
+        <div class="grid-chuc-nang">
+            <div class="chuc-nang-card" onclick="vaoFormNhapLieu('Bệnh án')"><div class="chuc-nang-icon">📋</div><h3>BÌNH BỆNH ÁN</h3></div>
+            <div class="chuc-nang-card" onclick="vaoFormNhapLieu('Đơn thuốc')"><div class="chuc-nang-icon">💊</div><h3>BÌNH ĐƠN THUỐC</h3></div>
+        </div>
+        <button onclick="dangXuat()" class="btn-main btn-danger" style="margin-top: 50px; width: 250px; display: block; margin-left: auto; margin-right: auto;">🚪 Đăng xuất hệ thống</button>
+    </div>
+
+    <div id="khu-vuc-nhap-lieu" style="display: none;">
+        <h2>NHẬP THÔNG TIN BÌNH BỆNH ÁN</h2>
+        <div class="subtitle-benh" id="hien-thi-ten-benh">TÊN BỆNH: ..........................</div>
+        
+        <div class="button-group">
+            <button onclick="xuLyLuuBenhAn()" class="btn-main btn-success">💾 LƯU BỆNH ÁN</button>
+            <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
+            <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
+            <button onclick="dangXuat()" class="btn-main btn-danger">🚪 ĐĂNG XUẤT</button>
+        </div>
+
+        <div class="form-section" style="background-color: #fefce8; border-top-color: #f59e0b;">
+            <h3 style="color: #d97706;">⚡ TẢI NHANH HỒ SƠ TỪ PHẦN MỀM BỆNH VIỆN</h3>
+            <div class="form-group">
+                <label>Chọn file Hồ sơ xuất từ phần mềm (.html):</label>
+                <input type="file" id="in-file-html" accept=".html,.htm" onchange="docFileHTMLHoso(event)" style="border: 2px dashed #f59e0b;">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>I. Cài đặt Trình chiếu & Hành chính</h3>
+            <div class="form-row">
+                <div class="form-group"><label style="color: #dc2626;">Tên Bệnh / Chẩn đoán (Bắt buộc):</label><input type="text" id="in-ten-benh" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
+                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay" value="BS. Đặng Ngọc Văn"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Khoa thực hiện:</label><select id="in-khoa"><option>Khoa Cấp cứu</option><option>Khoa Nội - Nhiễm</option><option>Khoa Ngoại</option><option>Khoa Sản</option><option>Khoa Nhi</option></select></div>
+                <div class="form-group"><label style="color: #f59e0b;">🔑 Mật khẩu bảo vệ (Dùng để Xóa):</label><input type="text" id="in-mat-khau" placeholder="Ví dụ: 1234"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Họ và tên bệnh nhân:</label><input type="text" id="in-ten"></div>
+                <div class="form-group"><label>Tuổi:</label><input type="text" id="in-tuoi"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Nghề nghiệp:</label><input type="text" id="in-nghe"></div>
+                <div class="form-group"><label>Địa chỉ:</label><input type="text" id="in-diachi"></div>
+            </div>
+            <div class="form-group"><label>Lý do vào viện:</label><textarea id="in-lydo" rows="2"></textarea></div>
+        </div>
+
+        <div class="form-section">
+            <h3>II. Bệnh sử & Tiền căn</h3>
+            <div class="form-group"><label>Bệnh sử:</label><textarea id="in-benhsu" rows="4"></textarea></div>
+            <div class="form-group"><label>Tiền căn:</label><textarea id="in-tiensu" rows="3"></textarea></div>
+            <div class="form-group"><label>Khám lâm sàng:</label><textarea id="in-khamchung" rows="4"></textarea></div>
+        </div>
+
+        <div class="form-section">
+            <h3>III. Kết quả Cận lâm sàng & Hình ảnh</h3>
+            <div class="form-group"><label>Văn bản (Tóm tắt XN máu, Mạch, HA...):</label><textarea id="in-cls-text" rows="3"></textarea></div>
+            <label>Hình ảnh Cận lâm sàng:</label>
+            <div id="danh-sach-anh"></div>
+            <button class="btn-add-row" onclick="themDongAnh()">+ Thêm 1 Hình ảnh & Ghi chú</button>
+        </div>
+
+        <div class="form-section">
+            <h3>IV. Tóm tắt & Chẩn đoán</h3>
+            <div class="form-group"><label>Tóm tắt bệnh án:</label><textarea id="in-tomtat" rows="3"></textarea></div>
+            <div class="form-group"><label>Chẩn đoán xác định:</label><input type="text" id="in-chandoan"></div>
+        </div>
+
+        <div class="form-section">
+            <h3>V. Diễn biến & Xử trí</h3>
+            <div id="danh-sach-dien-bien">
+                <div class="dynamic-row row-dienbien">
+                    <div style="flex: 1;"><input type="text" class="db-thoigian" placeholder="Thời gian (VD: 07h08 13/03)"></div>
+                    <div style="flex: 2;"><textarea class="db-dienbien" rows="3" placeholder="Diễn biến..."></textarea></div>
+                    <div style="flex: 2;"><textarea class="db-xutri" rows="3" placeholder="Xử trí..."></textarea></div>
+                    <button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>
+                </div>
+            </div>
+            <button class="btn-add-row" onclick="themDongDienBien()">+ Thêm mốc thời gian tiếp theo</button>
+            <div class="form-group" style="margin-top: 20px;"><label>Câu hỏi Bàn luận:</label><textarea id="in-banluan" rows="3"></textarea></div>
+        </div>
+    </div>
+
+    <div id="modal-luu" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:var(--success-color)">✅ LƯU THÀNH CÔNG</h3>
+            <div class="modal-info-row"><strong>Mã Hồ sơ:</strong> <span id="modal-ma-ba" style="color:red; font-weight:bold;"></span></div>
+            <div class="modal-info-row" style="color:#f59e0b; font-size:14px; margin-top:10px;"><i>* Vui lòng nhớ Mật khẩu bảo vệ để dùng khi muốn Xóa hồ sơ này.</i></div>
+            <button onclick="document.getElementById('modal-luu').style.display='none'" class="btn-main btn-primary" style="margin-top:20px; width:100%;">Đóng</button>
+        </div>
+    </div>
+    <div id="modal-tim-kiem" class="modal-overlay">
+        <div class="modal-content" style="width: 700px;">
+            <h3 style="color: var(--warning-color)">🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU</h3>
+            <div id="danh-sach-kq" class="search-list"></div>
+            <button onclick="document.getElementById('modal-tim-kiem').style.display='none'" class="btn-main" style="background:#ef4444; margin-top:20px; width:100%;">Đóng</button>
+        </div>
+    </div>
+
+    <div id="khu-vuc-trinh-chieu">
+        <div class="logo-corner"></div>
+        <div class="presenter-box">
+            <img src="https://cdn-icons-png.flaticon.com/512/3774/3774299.png" class="avatar">
+            <div class="presenter-name">
+                <span style="font-size: 14px; color: #64748b; font-weight:bold;">Người trình bày</span><br>
+                <strong style="color: var(--primary-color); font-size: 18px;" id="out-nguoi-trinh-bay"></strong>
+            </div>
+        </div>
+
+        <div id="slide-container">
+            
+            <div class="slide slide-base slide-welcome">
+                <div class="welcome-content">
+                    <img src="logott.png" class="welcome-logo" alt="Logo TTYT">
+                    <h1 class="welcome-title">✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨</h1>
+                    <h2 class="welcome-subtitle">KHOA: <span id="out-khoa-welcome"></span></h2>
+                    <hr class="welcome-divider">
+                    <h3 class="welcome-footer">🏥 TRUNG TÂM Y TẾ KHU VỰC HÀM THUẬN BẮC 🏥</h3>
+                </div>
+            </div>
+
+            <div class="slide slide-base">
+                <div class="slide-header">📝 I. HÀNH CHÍNH & LÝ DO</div>
+                <div class="slide-content">
+                    <p><strong>BỆNH LÝ:</strong> <span id="out-ten-benh" style="color: red; text-transform: uppercase;"></span></p>
+                    <p><strong>Họ tên:</strong> <span id="out-ten" style="text-transform: uppercase;"></span> <span style="margin-left:30px;"><strong>Tuổi:</strong> <span id="out-tuoi"></span></span></p>
+                    <p><strong>Nghề nghiệp:</strong> <span id="out-nghe"></span> <span style="margin-left:30px;"><strong>Địa chỉ:</strong> <span id="out-diachi"></span></span></p>
+                    <p><strong>Lý do vào viện:</strong> <span id="out-lydo"></span></p>
+                </div>
+            </div>
+            <div class="slide slide-base">
+                <div class="slide-header">🩺 II. BỆNH SỬ & TIỀN CĂN</div>
+                <div class="slide-content">
+                    <p><strong>1. Bệnh sử:</strong></p><p id="out-benhsu" class="text-indent"></p>
+                    <p><strong>2. Tiền căn:</strong></p><p id="out-tiensu" class="text-indent"></p>
+                </div>
+            </div>
+            <div class="slide slide-base">
+                <div class="slide-header">🧑‍⚕️ III. KHÁM LÂM SÀNG</div>
+                <div class="slide-content"><p id="out-khamchung" class="text-indent"></p></div>
+            </div>
+            <div class="slide slide-base">
+                <div class="slide-header">🔬 IV. CẬN LÂM SÀNG</div>
+                <div class="slide-content"><p id="out-cls-text"></p></div>
+            </div>
+            
+            <div class="slide slide-base">
+                <div class="slide-header">📋 V. TÓM TẮT & CHẨN ĐOÁN</div>
+                <div class="slide-content">
+                    <p><strong>Tóm tắt:</strong></p><p id="out-tomtat" class="text-indent"></p>
+                    <p><strong>CHẨN ĐOÁN:</strong> <span id="out-chandoan" style="color: red; text-transform: uppercase;"></span></p>
+                </div>
+            </div>
+            <div class="slide slide-base">
+                <div class="slide-header">💊 VI. DIỄN BIẾN & XỬ TRÍ</div>
+                <div class="slide-content">
+                    <div id="out-bang-dienbien"></div> 
+                </div>
+            </div>
+            <div class="slide slide-base">
+                <div class="slide-header">💡 VII. VẤN ĐỀ BÀN LUẬN</div>
+                <div class="slide-content"><p id="out-banluan" class="text-indent" style="color: #0284c7; font-weight: 900;"></p></div>
+            </div>
+        </div>
+
+        <div class="slide-controls">
+            <button onclick="chuyenSlide(-1)">Quay lại</button>
+            <button onclick="chuyenSlide(1)">Tiếp theo</button>
+            <button onclick="ketThucTrinhChieu()" style="background-color: #ef4444; color: white;">Thoát</button>
+        </div>
+    </div>
+
+    <script>
+        let slideHienTai = 0;
+        let danhSachSlide = [];
+        let trangThaiDaLuu = false; 
+        let maHoSoHienTai = "";
+
+        // --- ĐĂNG NHẬP & ĐIỀU HƯỚNG ---
+        function xuLyDangNhap() {
+            document.getElementById("khu-vuc-dang-nhap").style.display = "none";
+            document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
+        }
+        function vaoFormNhapLieu(loai) {
+            if(loai === 'Đơn thuốc') { alert("Tính năng đang phát triển!"); return; }
+            document.getElementById("khu-vuc-chon-chuc-nang").style.display = "none";
+            document.getElementById("khu-vuc-nhap-lieu").style.display = "block";
+        }
+        function dangXuat() { location.reload(); }
+
+        function docFileHTMLHoso(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                alert("✅ Đã đọc file HTML thành công!");
+            };
+            reader.readAsText(file);
+        }
+
+        // --- LOGIC THÊM ĐỘNG ---
+        function xoaDong(btn) { btn.parentElement.remove(); }
+        function themDongAnh() {
+            let div = document.createElement("div"); div.className = "dynamic-row row-anh";
+            div.innerHTML = `<div style="flex: 1;"><input type="file" class="file-anh" accept="image/*"></div><div style="flex: 2;"><input type="text" class="txt-ghichu" placeholder="Nhập ghi chú cho hình này..."></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+            document.getElementById("danh-sach-anh").appendChild(div);
+        }
+        function themDongDienBien() {
+            let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+            div.innerHTML = `<div style="flex: 1;"><input type="text" class="db-thoigian" placeholder="Thời gian..."></div><div style="flex: 2;"><textarea class="db-dienbien" rows="3" placeholder="Diễn biến..."></textarea></div><div style="flex: 2;"><textarea class="db-xutri" rows="3" placeholder="Xử trí..."></textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+            document.getElementById("danh-sach-dien-bien").appendChild(div);
+        }
+
+        // --- LƯU, XÓA & TÌM KIẾM ---
+        function capNhatTieuDeBenh() {
+            let val = document.getElementById("in-ten-benh").value;
+            document.getElementById("hien-thi-ten-benh").innerText = val ? "TÊN BỆNH: " + val.toUpperCase() : "TÊN BỆNH: ..........................";
+            trangThaiDaLuu = false; 
+        }
+
+        function xuLyLuuBenhAn() {
+            let tenBenh = document.getElementById("in-ten-benh").value.trim();
+            let matKhau = document.getElementById("in-mat-khau").value.trim();
+            
+            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh/Chẩn đoán!"); document.getElementById("in-ten-benh").focus(); return; }
+            if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm hồ sơ của bạn!"); document.getElementById("in-mat-khau").focus(); return; }
+
+            if(!maHoSoHienTai) maHoSoHienTai = "BA-" + new Date().getTime().toString().slice(-6);
+
+            let arrDienBien = [];
+            document.querySelectorAll(".row-dienbien").forEach(row => {
+                arrDienBien.push({
+                    tg: row.querySelector('.db-thoigian').value,
+                    db: row.querySelector('.db-dienbien').value,
+                    xt: row.querySelector('.db-xutri').value
+                });
+            });
+
+            let duLieu = {
+                id: maHoSoHienTai, khoa: document.getElementById("in-khoa").value, matKhau: matKhau, tenBenh: tenBenh,
+                nguoiTrinhBay: document.getElementById("in-nguoi-trinh-bay").value,
+                tenBN: document.getElementById("in-ten").value, tuoi: document.getElementById("in-tuoi").value,
+                nghe: document.getElementById("in-nghe").value, diaChi: document.getElementById("in-diachi").value,
+                lyDo: document.getElementById("in-lydo").value, benhSu: document.getElementById("in-benhsu").value,
+                tienSu: document.getElementById("in-tiensu").value, khamChung: document.getElementById("in-khamchung").value,
+                clsText: document.getElementById("in-cls-text").value, tomtat: document.getElementById("in-tomtat").value,
+                chandoan: document.getElementById("in-chandoan").value, banluan: document.getElementById("in-banluan").value,
+                dienBienList: arrDienBien
+            };
+
+            let db = JSON.parse(localStorage.getItem('DataBA') || '[]');
+            let index = db.findIndex(x => x.id === maHoSoHienTai);
+            if(index > -1) db[index] = duLieu; else db.push(duLieu);
+            localStorage.setItem('DataBA', JSON.stringify(db));
+
+            document.getElementById("modal-ma-ba").innerText = maHoSoHienTai;
+            document.getElementById("modal-luu").style.display = "flex";
+            trangThaiDaLuu = true; 
+        }
+
+        function moModalTimKiem() {
+            let db = JSON.parse(localStorage.getItem('DataBA') || '[]');
+            let h = db.length ? "" : "<p style='text-align:center;'>Chưa có bệnh án nào được lưu.</p>";
+            
+            db.reverse().forEach(ba => {
+                h += `
+                <div class="search-item">
+                    <div class="search-item-info" onclick="taiDuLieu('${ba.id}')">
+                        <strong>${ba.id}</strong> - ${ba.tenBenh} <br>
+                        <span style="font-size: 14px; color: #64748b;">${ba.khoa} | Người trình bày: ${ba.nguoiTrinhBay}</span>
+                    </div>
+                    <button class="btn-delete-ba" onclick="xoaBenhAn('${ba.id}', event)">🗑️ Xóa</button>
+                </div>`;
+            });
+            document.getElementById("danh-sach-kq").innerHTML = h;
+            document.getElementById("modal-tim-kiem").style.display = "flex";
+        }
+
+        // --- MỚI: HÀM XÓA BỆNH ÁN CÓ BẢO VỆ MẬT KHẨU ---
+        function xoaBenhAn(id, event) {
+            event.stopPropagation(); // Ngăn chặn bấm nhầm sang phần tải dữ liệu
+
+            let db = JSON.parse(localStorage.getItem('DataBA') || '[]');
+            let ba = db.find(x => x.id === id);
+            if(!ba) return;
+
+            // Kiểm tra mật khẩu (nếu bệnh án có cài mật khẩu)
+            if(ba.matKhau) {
+                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.\nVui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa:`);
+                if(mkNhap === null) return; // Người dùng bấm Hủy
+                if(mkNhap !== ba.matKhau) {
+                    alert("❌ MẬT KHẨU KHÔNG ĐÚNG! Bạn không có quyền xóa hồ sơ này.");
+                    return;
+                }
+            }
+
+            // Xác nhận lần cuối
+            let xacNhan = confirm(`⚠️ Mật khẩu hợp lệ. Bạn có chắc chắn XÓA VĨNH VIỄN hồ sơ [${id}] không?`);
+            if(xacNhan) {
+                db = db.filter(x => x.id !== id);
+                localStorage.setItem('DataBA', JSON.stringify(db));
+                
+                // Nếu hồ sơ đang mở trên form bị xóa thì reset mã
+                if(maHoSoHienTai === id) maHoSoHienTai = "";
+                
+                moModalTimKiem(); // Làm mới danh sách
+            }
+        }
+
+        function taiDuLieu(id) {
+            let ba = JSON.parse(localStorage.getItem('DataBA') || '[]').find(x => x.id === id);
+            if(ba) {
+                maHoSoHienTai = ba.id;
+                document.getElementById("in-khoa").value = ba.khoa;
+                document.getElementById("in-mat-khau").value = ba.matKhau || "";
+                document.getElementById("in-ten-benh").value = ba.tenBenh;
+                document.getElementById("in-nguoi-trinh-bay").value = ba.nguoiTrinhBay;
+                document.getElementById("in-ten").value = ba.tenBN;
+                document.getElementById("in-tuoi").value = ba.tuoi;
+                document.getElementById("in-nghe").value = ba.nghe;
+                document.getElementById("in-diachi").value = ba.diaChi;
+                document.getElementById("in-lydo").value = ba.lyDo;
+                document.getElementById("in-benhsu").value = ba.benhSu;
+                document.getElementById("in-tiensu").value = ba.tienSu;
+                document.getElementById("in-khamchung").value = ba.khamChung;
+                document.getElementById("in-cls-text").value = ba.clsText;
+                document.getElementById("in-tomtat").value = ba.tomtat;
+                document.getElementById("in-chandoan").value = ba.chandoan;
+                document.getElementById("in-banluan").value = ba.banluan;
+
+                document.getElementById("danh-sach-dien-bien").innerHTML = "";
+                ba.dienBienList.forEach(item => {
+                    let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+                    div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                    document.getElementById("danh-sach-dien-bien").appendChild(div);
+                });
+
+                capNhatTieuDeBenh(); trangThaiDaLuu = true; 
+                document.getElementById("modal-tim-kiem").style.display = "none";
+            }
+        }
+
+        // --- TRÌNH CHIẾU NÂNG CAO ---
+        async function batDauTrinhChieu() {
+            if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU BỆNH ÁN!"); return; }
+
+            // Truyền tên Khoa ra Slide Welcome
+            document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa").value;
+
+            document.getElementById("out-ten-benh").innerText = document.getElementById("in-ten-benh").value;
+            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay").value;
+            document.getElementById("out-ten").innerText = document.getElementById("in-ten").value;
+            document.getElementById("out-tuoi").innerText = document.getElementById("in-tuoi").value;
+            document.getElementById("out-nghe").innerText = document.getElementById("in-nghe").value;
+            document.getElementById("out-diachi").innerText = document.getElementById("in-diachi").value;
+            document.getElementById("out-lydo").innerText = document.getElementById("in-lydo").value;
+            document.getElementById("out-benhsu").innerText = document.getElementById("in-benhsu").value;
+            document.getElementById("out-tiensu").innerText = document.getElementById("in-tiensu").value;
+            document.getElementById("out-khamchung").innerText = document.getElementById("in-khamchung").value;
+            document.getElementById("out-cls-text").innerText = document.getElementById("in-cls-text").value;
+            document.getElementById("out-tomtat").innerText = document.getElementById("in-tomtat").value;
+            document.getElementById("out-chandoan").innerText = document.getElementById("in-chandoan").value;
+            document.getElementById("out-banluan").innerText = document.getElementById("in-banluan").value;
+
+            let htmlBang = `<table class="tb-dienbien"><tr><th>THỜI GIAN</th><th>DIỄN BIẾN</th><th>XỬ TRÍ</th></tr>`;
+            document.querySelectorAll(".row-dienbien").forEach(row => {
+                let tg = row.querySelector('.db-thoigian').value;
+                let db = row.querySelector('.db-dienbien').value.replace(/\n/g, "<br>");
+                let xt = row.querySelector('.db-xutri').value.replace(/\n/g, "<br>");
+                if(tg || db || xt) {
+                    htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
+                }
+            });
+            htmlBang += `</table>`;
+            document.getElementById("out-bang-dienbien").innerHTML = htmlBang;
+
+            document.querySelectorAll('.slide-anh-dong').forEach(e => e.remove());
+            let anhRows = document.querySelectorAll('.row-anh');
+            
+            // Vị trí chèn ảnh thay đổi vì đã có thêm 1 trang Welcome ở đầu. 
+            // 0: Welcome, 1: Hành chính, 2: Bệnh sử, 3: Khám LS, 4: Cận LS -> Ảnh sẽ nằm ở vị trí số 5
+            let slideIndexInsert = 5; 
+            let container = document.getElementById("slide-container");
+
+            for(let row of anhRows) {
+                let fileInput = row.querySelector('.file-anh');
+                let ghiChu = row.querySelector('.txt-ghichu').value;
+                
+                if (fileInput.files && fileInput.files[0]) {
+                    let base64 = await new Promise((resolve) => {
+                        let reader = new FileReader();
+                        reader.onload = (e) => resolve(e.target.result);
+                        reader.readAsDataURL(fileInput.files[0]);
+                    });
+
+                    let newSlide = document.createElement('div');
+                    newSlide.className = 'slide slide-anh-dong';
+                    newSlide.innerHTML = `
+                        <div class="slide-header">📸 IV. HÌNH ẢNH CẬN LÂM SÀNG</div>
+                        <div class="slide-content" style="height: 100%; display: flex; flex-direction: column;">
+                            <div class="slide-image-container">
+                                <img src="${base64}">
+                                ${ghiChu ? `<div class="slide-image-note">${ghiChu}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    container.insertBefore(newSlide, container.children[slideIndexInsert]);
+                    slideIndexInsert++; 
+                }
+            }
+
+            document.getElementById("khu-vuc-nhap-lieu").style.display = "none";
+            document.getElementById("khu-vuc-trinh-chieu").style.display = "block";
+            let elem = document.documentElement; if (elem.requestFullscreen) elem.requestFullscreen();
+
+            danhSachSlide = document.getElementsByClassName("slide"); 
+            // Luôn luôn bắt đầu từ Slide 0 (Trang Chào mừng)
+            slideHienTai = 0;
+            hienThiSlide(slideHienTai);
+        }
+
+        function ketThucTrinhChieu() {
+            document.getElementById("khu-vuc-trinh-chieu").style.display = "none";
+            document.getElementById("khu-vuc-nhap-lieu").style.display = "block";
+            if (document.exitFullscreen) document.exitFullscreen();
+        }
+
+        function hienThiSlide(n) {
+            for (let i = 0; i < danhSachSlide.length; i++) danhSachSlide[i].classList.remove("active"); 
+            if(danhSachSlide[n]) danhSachSlide[n].classList.add("active"); 
+        }
+
+        function chuyenSlide(buoc) {
+            if (slideHienTai + buoc >= 0 && slideHienTai + buoc < danhSachSlide.length) {
+                slideHienTai += buoc;
+                hienThiSlide(slideHienTai);
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById("khu-vuc-trinh-chieu").style.display === "block") {
+                if (event.key === "ArrowRight") chuyenSlide(1);
+                else if (event.key === "ArrowLeft") chuyenSlide(-1);
+                else if (event.key === "Escape") ketThucTrinhChieu();
+            }
+        });
+    </script>
+</body>
+</html>
