@@ -26,7 +26,7 @@
         .chuc-nang-card h3 { color: var(--text-color); margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;}
 
         /* =========================================
-           3. FORM NHẬP LIỆU (ÉP CHUẨN GRID 50/50 CỰC KỲ VUÔNG VỨC)
+           3. FORM NHẬP LIỆU
         ========================================= */
         #khu-vuc-nhap-lieu { max-width: 950px; margin: 0 auto; }
         h2 { text-align: center; color: var(--primary-color); font-size: 30px; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; }
@@ -35,7 +35,6 @@
         .form-section { background-color: var(--card-bg); padding: 25px; margin-bottom: 25px; border-radius: 10px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
         .form-section h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-size: 22px; font-weight: 800;}
 
-        /* DÙNG CSS GRID ĐỂ ÉP BUỘC CHIA ĐÔI MÀN HÌNH CHÍNH XÁC */
         .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; width: 100%; }
         .form-row .form-group { margin-bottom: 0; width: 100%; min-width: 0; } 
         
@@ -45,7 +44,6 @@
         .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); white-space: normal; }
         .highlight-input { border: 2px solid #dc2626 !important; background-color: #fef2f2 !important; font-weight: bold;}
 
-        /* Ô nhập liệu diễn biến thì dùng flex như cũ vì nó chia 3 phần khác nhau */
         .dynamic-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;}
         .dynamic-row .form-group { margin-bottom: 0; }
         
@@ -74,7 +72,7 @@
         .btn-delete-ba:hover { background-color: #dc2626; color: white; }
 
         /* =========================================
-           5. KHU VỰC TRÌNH CHIẾU
+           5. KHU VỰC TRÌNH CHIẾU & THANH CUỘN MỚI
         ========================================= */
         #khu-vuc-trinh-chieu { display: none; width: 100vw; height: 100vh; background-color: white; position: fixed; top: 0; left: 0; z-index: 1000; overflow: hidden; cursor: pointer;}
         #khu-vuc-trinh-chieu::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vh; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.05; z-index: 1; pointer-events: none; }
@@ -86,12 +84,29 @@
         .slide { display: none; height: 100%; padding: 40px 80px; box-sizing: border-box; }
         .slide.active { display: block; animation: slideInRight 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
         
-        .slide-header, .slide-content { position: relative; z-index: 10; pointer-events: none; }
+        .slide-header { font-size: 55px; font-weight: 900; color: var(--primary-color); border-bottom: 4px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px; margin-left: 100px; margin-right: 250px; position: relative; z-index: 10; pointer-events: none; }
         
-        .slide-header { font-size: 55px; font-weight: 900; color: var(--primary-color); border-bottom: 4px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px; margin-left: 100px; margin-right: 250px; }
-        .slide-content { font-size: 40px; line-height: 1.5; color: #1e293b; padding-left: 20px;}
+        .slide-content { 
+            font-size: 38px;
+            line-height: 1.5; 
+            color: #1e293b; 
+            padding-left: 20px; 
+            position: relative; 
+            z-index: 10; 
+            pointer-events: auto; 
+            max-height: 65vh; 
+            overflow-y: auto; 
+            padding-right: 15px;
+        }
+        
+        .slide-content::-webkit-scrollbar { width: 8px; }
+        .slide-content::-webkit-scrollbar-track { background: transparent; }
+        .slide-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .slide-content::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
         .slide-content p strong { font-weight: 900; color: var(--primary-color); }
-        .text-indent { padding-left: 40px; margin-top: 10px; color: #334155; }
+        
+        .text-indent, #out-cls-text { padding-left: 40px; margin-top: 10px; color: #334155; white-space: pre-wrap; }
         
         .slide-controls { position: absolute; bottom: 30px; right: 50px; display: flex; gap: 15px; z-index: 100; pointer-events: auto;}
         .slide-controls button { width: auto; font-size: 20px; padding: 12px 30px; color: var(--text-color); background-color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 800;}
@@ -182,10 +197,24 @@
         </div>
 
         <div class="form-section" style="background-color: #fefce8; border-top-color: #f59e0b;">
-            <h3 style="color: #d97706;">⚡ TẢI NHANH HỒ SƠ TỪ PHẦN MỀM BỆNH VIỆN</h3>
-            <div class="form-group">
-                <label>Chọn file Hồ sơ xuất từ phần mềm (.html):</label>
-                <input type="file" id="in-file-html" accept=".html,.htm" onchange="docFileHTMLHoso(event)" style="border: 2px dashed #f59e0b;">
+            <h3 style="color: #d97706;">⚡ QUẢN LÝ & TẢI DỮ LIỆU TỪ FILE</h3>
+            <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>1. Tải XML (Từ phần mềm HIS):</label>
+                    <input type="file" id="in-file-xml" accept=".xml" onchange="docFileXMLHoso(event)" style="border: 2px dashed #f59e0b; padding: 10px; background: white; cursor: pointer;">
+                </div>
+                
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>2. Tải File Backup Hệ Thống (.json):</label>
+                    <input type="file" id="in-file-json" accept=".json" onchange="nhapFileDuLieu(event)" style="border: 2px dashed #16a34a; padding: 10px; background: white; cursor: pointer;">
+                </div>
+                
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>3. Sao lưu Dữ liệu đang nhập:</label>
+                    <button onclick="xuatFileDuLieu()" class="btn-main" style="background-color: #0284c7; width: 100%; padding: 12px; margin: 0;">⬇️ XUẤT FILE SAO LƯU</button>
+                </div>
+                
             </div>
         </div>
 
@@ -201,7 +230,7 @@
                 <div class="form-group">
                     <label>Khoa thực hiện:</label>
                     <select id="in-khoa">
-                        <option>Khoa Cấp cứu - Hồi sức tích cực và Chống độc</option>
+                        <option>Khoa Cấp cứu</option>
                         <option>Khoa Ngoại - Gây mê hồi sức</option>
                         <option>Khoa Nội Tổng hợp</option>
                         <option>Khoa Nhi</option>
@@ -386,12 +415,6 @@
         }
         
         function dangXuat() { location.reload(); }
-
-        function docFileHTMLHoso(event) {
-            let file = event.target.files[0];
-            if (!file) return;
-            alert("✅ Tính năng bóc tách HTML đang chờ cấu trúc từ Bệnh viện!");
-        }
 
         function xoaDong(btn) { btn.parentElement.remove(); }
         
@@ -661,6 +684,172 @@
                 chuyenSlide(-1);
             }
         });
+
+        // 1. HÀM ĐỌC FILE XML BHYT CỦA BỘ Y TẾ
+        function docFileXMLHoso(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let text = e.target.result;
+                let parser = new DOMParser();
+                let xmlDoc = parser.parseFromString(text, "text/xml");
+                
+                let filesHoso = xmlDoc.getElementsByTagName("FILEHOSO");
+                let base64Data = "";
+                for (let i = 0; i < filesHoso.length; i++) {
+                    let loai = filesHoso[i].getElementsByTagName("LOAIHOSO")[0]?.textContent;
+                    if (loai === "XML1") {
+                        base64Data = filesHoso[i].getElementsByTagName("NOIDUNGFILE")[0]?.textContent;
+                        break;
+                    }
+                }
+
+                if (!base64Data) {
+                    alert("❌ Không tìm thấy dữ liệu XML1 trong file này!");
+                    return;
+                }
+
+                try {
+                    let decodedStr = decodeURIComponent(escape(window.atob(base64Data)));
+                    let xmlDacTa = parser.parseFromString(decodedStr, "text/xml");
+
+                    let hoTen = xmlDacTa.getElementsByTagName("HO_TEN")[0]?.textContent || "";
+                    let ngaySinhStr = xmlDacTa.getElementsByTagName("NGAY_SINH")[0]?.textContent || ""; 
+                    let diaChi = xmlDacTa.getElementsByTagName("DIA_CHI")[0]?.textContent || "";
+                    let tenBenh = xmlDacTa.getElementsByTagName("TEN_BENH")[0]?.textContent || "";
+                    let lyDoVaoVien = xmlDacTa.getElementsByTagName("LY_DO_VV")[0]?.textContent || "";
+
+                    let tuoi = "";
+                    if (ngaySinhStr.length >= 4) {
+                        let namSinh = parseInt(ngaySinhStr.substring(0, 4));
+                        let namHienTai = new Date().getFullYear();
+                        tuoi = (namHienTai - namSinh).toString();
+                    }
+
+                    let tenBenhChuan = tenBenh.split(';')[0]; 
+
+                    document.getElementById("in-ten").value = hoTen;
+                    document.getElementById("in-tuoi").value = tuoi;
+                    document.getElementById("in-diachi").value = diaChi;
+                    document.getElementById("in-ten-benh").value = tenBenhChuan;
+                    document.getElementById("in-chandoan").value = tenBenh;
+                    document.getElementById("in-lydo").value = lyDoVaoVien; 
+                    
+                    capNhatTieuDeBenh();
+                    alert("✅ Đã tải thành công hồ sơ bệnh nhân: " + hoTen);
+                } catch (error) {
+                    console.error("Lỗi parse dữ liệu:", error);
+                    alert("❌ Có lỗi xảy ra khi giải mã file XML này!");
+                }
+                event.target.value = ''; // Reset input
+            };
+            reader.readAsText(file);
+        }
+
+        // 2. HÀM XUẤT FILE SAO LƯU (.JSON)
+        function xuatFileDuLieu() {
+            let tenBenh = document.getElementById("in-ten-benh").value.trim();
+            if(!tenBenh) { 
+                alert("⚠️ Vui lòng nhập Tên bệnh/Chẩn đoán trước khi xuất file!"); 
+                document.getElementById("in-ten-benh").focus(); 
+                return; 
+            }
+
+            let arrDienBien = [];
+            document.querySelectorAll(".row-dienbien").forEach(row => {
+                arrDienBien.push({
+                    tg: row.querySelector('.db-thoigian').value,
+                    db: row.querySelector('.db-dienbien').value,
+                    xt: row.querySelector('.db-xutri').value
+                });
+            });
+
+            let duLieu = {
+                khoa: document.getElementById("in-khoa").value, 
+                matKhau: document.getElementById("in-mat-khau").value, 
+                tenBenh: tenBenh,
+                nguoiTrinhBay: document.getElementById("in-nguoi-trinh-bay").value,
+                tenBN: document.getElementById("in-ten").value, 
+                tuoi: document.getElementById("in-tuoi").value,
+                nghe: document.getElementById("in-nghe").value, 
+                diaChi: document.getElementById("in-diachi").value,
+                lyDo: document.getElementById("in-lydo").value, 
+                benhSu: document.getElementById("in-benhsu").value,
+                tienSu: document.getElementById("in-tiensu").value, 
+                khamChung: document.getElementById("in-khamchung").value,
+                clsText: document.getElementById("in-cls-text").value, 
+                tomtat: document.getElementById("in-tomtat").value,
+                chandoan: document.getElementById("in-chandoan").value, 
+                banluan: document.getElementById("in-banluan").value,
+                dienBienList: arrDienBien
+            };
+
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(duLieu, null, 2));
+            let downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            
+            // Tạo tên file từ tên bệnh nhân
+            let tenBN_File = document.getElementById("in-ten").value.trim();
+            if(!tenBN_File) tenBN_File = "KhongTen";
+            let fileName = "Backup_HSBA_" + tenBN_File.replace(/\s/g, "_") + ".json";
+            
+            downloadAnchorNode.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchorNode); 
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // 3. HÀM NHẬP FILE SAO LƯU VÀO LẠI HỆ THỐNG
+        function nhapFileDuLieu(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let ba = JSON.parse(e.target.result);
+                    
+                    document.getElementById("in-khoa").value = ba.khoa || "";
+                    document.getElementById("in-mat-khau").value = ba.matKhau || "";
+                    document.getElementById("in-ten-benh").value = ba.tenBenh || "";
+                    document.getElementById("in-nguoi-trinh-bay").value = ba.nguoiTrinhBay || "";
+                    document.getElementById("in-ten").value = ba.tenBN || "";
+                    document.getElementById("in-tuoi").value = ba.tuoi || "";
+                    document.getElementById("in-nghe").value = ba.nghe || "";
+                    document.getElementById("in-diachi").value = ba.diaChi || "";
+                    document.getElementById("in-lydo").value = ba.lyDo || "";
+                    document.getElementById("in-benhsu").value = ba.benhSu || "";
+                    document.getElementById("in-tiensu").value = ba.tienSu || "";
+                    document.getElementById("in-khamchung").value = ba.khamChung || "";
+                    document.getElementById("in-cls-text").value = ba.clsText || "";
+                    document.getElementById("in-tomtat").value = ba.tomtat || "";
+                    document.getElementById("in-chandoan").value = ba.chandoan || "";
+                    document.getElementById("in-banluan").value = ba.banluan || "";
+
+                    // Phục hồi danh sách diễn biến
+                    document.getElementById("danh-sach-dien-bien").innerHTML = "";
+                    if(ba.dienBienList && ba.dienBienList.length > 0) {
+                        ba.dienBienList.forEach(item => {
+                            let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                            document.getElementById("danh-sach-dien-bien").appendChild(div);
+                        });
+                    } else {
+                        themDongDienBien();
+                    }
+
+                    capNhatTieuDeBenh();
+                    alert("✅ Đã khôi phục dữ liệu từ file sao lưu thành công!");
+                } catch (error) {
+                    console.error("Lỗi parse JSON:", error);
+                    alert("❌ File không đúng định dạng sao lưu (.json)!");
+                }
+                event.target.value = ''; // Reset input
+            };
+            reader.readAsText(file);
+        }
     </script>
 </body>
 </html>
