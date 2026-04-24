@@ -87,7 +87,7 @@
         .btn-delete-ba:hover { background-color: #dc2626; color: white; }
 
         /* =========================================
-           5. KHU VỰC TRÌNH CHIẾU & THANH CUỘN MỚI
+           5. KHU VỰC TRÌNH CHIẾU
         ========================================= */
         #khu-vuc-trinh-chieu { display: none; width: 100vw; height: 100vh; background-color: white; position: fixed; top: 0; left: 0; z-index: 1000; overflow: hidden; cursor: pointer;}
         #khu-vuc-trinh-chieu::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vh; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.05; z-index: 1; pointer-events: none; }
@@ -186,7 +186,7 @@
             <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU BỆNH ÁN</button>
             <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
             <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
-            <button onclick="dangXuat()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
+            <button onclick="quayLaiMenu()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
         </div>
 
         <div class="form-section" style="background-color: #fefce8; border-top-color: #f59e0b;">
@@ -276,13 +276,13 @@
 
     <div id="khu-vuc-nhap-lieu-dt" class="khu-vuc-nhap">
         <h2>NHẬP THÔNG TIN BÌNH ĐƠN THUỐC</h2>
-        <div class="subtitle-benh" id="hien-thi-ten-benh-dt">CHẨN ĐOÁN / ĐƠN THUỐC: ..........................</div>
+        <div class="subtitle-benh" id="hien-thi-ten-benh-dt">THÔNG TIN ĐƠN THUỐC: ..........................</div>
         
         <div class="button-group">
             <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU ĐƠN THUỐC</button>
             <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
             <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
-            <button onclick="dangXuat()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
+            <button onclick="quayLaiMenu()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
         </div>
 
         <div class="form-section" style="background-color: #fefce8; border-top-color: #16a34a;">
@@ -302,7 +302,7 @@
         <div class="form-section">
             <h3>I. Cài đặt Trình chiếu & Hành chính</h3>
             <div class="form-row">
-                <div class="form-group"><label style="color: #dc2626;">Chẩn đoán / Tên Đơn Thuốc (Bắt buộc):</label><input type="text" id="in-ten-benh-dt" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
+                <div class="form-group"><label style="color: #dc2626;">Thông tin đơn thuốc (Bắt buộc):</label><input type="text" id="in-ten-benh-dt" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
                 <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay-dt" value="BS. Đặng Ngọc Văn"></div>
             </div>
             <div class="form-row">
@@ -445,22 +445,44 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let loaiFormHienTai = 'BA'; // 'BA' (Bệnh án) hoặc 'DT' (Đơn thuốc)
+        let loaiFormHienTai = 'BA'; 
         let slideHienTai = 0;
         let danhSachSlide = [];
         let trangThaiDaLuu = false; 
         let maHoSoHienTai = "";
         let duLieuTamThoi = []; 
 
+        // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP KHI MỞ/TẢI LẠI TRANG
+        window.onload = function() {
+            if(localStorage.getItem("daDangNhap") === "true") {
+                document.getElementById("khu-vuc-dang-nhap").style.display = "none";
+                document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
+            }
+        };
+
         function xuLyDangNhap() {
+            // Lưu trạng thái đăng nhập vào Local Storage
+            localStorage.setItem("daDangNhap", "true");
             document.getElementById("khu-vuc-dang-nhap").style.display = "none";
+            document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
+        }
+
+        function dangXuat() { 
+            // Xóa trạng thái đăng nhập khi nhấn Đăng xuất
+            localStorage.removeItem("daDangNhap");
+            location.reload(); 
+        }
+
+        function quayLaiMenu() {
+            document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "none";
+            document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "none";
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
         }
         
         function vaoFormNhapLieu(loai) {
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "none";
             loaiFormHienTai = loai;
-            maHoSoHienTai = ""; // Reset mã hồ sơ
+            maHoSoHienTai = ""; 
             trangThaiDaLuu = false;
 
             if(loai === 'BA') {
@@ -472,7 +494,6 @@
             }
         }
         
-        function dangXuat() { location.reload(); }
         function xoaDong(btn) { btn.parentElement.parentElement.remove(); }
 
         // ==========================================
@@ -580,7 +601,7 @@
         function capNhatTieuDeBenh() {
             let val = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value;
             let hienThiId = loaiFormHienTai === 'BA' ? "hien-thi-ten-benh-ba" : "hien-thi-ten-benh-dt";
-            let prefix = loaiFormHienTai === 'BA' ? "TÊN BỆNH: " : "ĐƠN THUỐC / CHẨN ĐOÁN: ";
+            let prefix = loaiFormHienTai === 'BA' ? "TÊN BỆNH: " : "THÔNG TIN ĐƠN THUỐC: ";
             document.getElementById(hienThiId).innerText = val ? prefix + val.toUpperCase() : prefix + "..........................";
             trangThaiDaLuu = false; 
         }
@@ -828,7 +849,6 @@
                 if (base64) {
                     let newSlide = document.createElement('div');
                     newSlide.className = 'slide slide-anh-dong slide-active-target'; 
-                    // CHỈNH SỬA TÊN HEADER Ở ĐÂY
                     let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
                     newSlide.innerHTML = `
                         <div class="slide-header">${titleStr}</div>
@@ -965,7 +985,7 @@
         function xuatFileDuLieu() {
             let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
             let tenBenh = document.getElementById("in-ten-benh" + s).value.trim();
-            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Chẩn đoán trước khi xuất file!"); document.getElementById("in-ten-benh" + s).focus(); return; }
+            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); document.getElementById("in-ten-benh" + s).focus(); return; }
 
             let arrAnh = [];
             document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
