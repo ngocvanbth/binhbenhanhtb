@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ Thống Bình Bệnh Án - TTYT Hàm Thuận Bắc</title>
+    <title>Hệ Thống Bình Bệnh Án & Đơn Thuốc - Trung tâm Y tế khu vực Hàm Thuận Bắc</title>
     <style>
         /* =========================================
            1. THIẾT LẬP CƠ BẢN & MÀU SẮC
@@ -26,9 +26,9 @@
         .chuc-nang-card h3 { color: var(--text-color); margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;}
 
         /* =========================================
-           3. FORM NHẬP LIỆU
+           3. FORM NHẬP LIỆU CHUNG
         ========================================= */
-        #khu-vuc-nhap-lieu { max-width: 950px; margin: 0 auto; }
+        .khu-vuc-nhap { max-width: 950px; margin: 0 auto; display: none; margin-top: 30px; }
         h2 { text-align: center; color: var(--primary-color); font-size: 30px; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; }
         .subtitle-benh { text-align: center; font-size: 22px; font-weight: bold; color: #dc2626; margin-bottom: 25px; }
 
@@ -59,7 +59,7 @@
         .btn-danger { background-color: #dc2626; }
 
         /* =========================================
-           CSS KHU VỰC PASTE ẢNH MỚI
+           KHU VỰC PASTE ẢNH
         ========================================= */
         .paste-zone {
             flex: 1; border: 2px dashed #0284c7; border-radius: 8px; padding: 20px; 
@@ -87,7 +87,7 @@
         .btn-delete-ba:hover { background-color: #dc2626; color: white; }
 
         /* =========================================
-           5. KHU VỰC TRÌNH CHIẾU
+           5. KHU VỰC TRÌNH CHIẾU & THANH CUỘN MỚI
         ========================================= */
         #khu-vuc-trinh-chieu { display: none; width: 100vw; height: 100vh; background-color: white; position: fixed; top: 0; left: 0; z-index: 1000; overflow: hidden; cursor: pointer;}
         #khu-vuc-trinh-chieu::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vh; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.05; z-index: 1; pointer-events: none; }
@@ -101,26 +101,12 @@
         
         .slide-header { font-size: 55px; font-weight: 900; color: var(--primary-color); border-bottom: 4px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px; margin-left: 100px; margin-right: 250px; position: relative; z-index: 10; pointer-events: none; }
         
-        .slide-content { 
-            font-size: 38px;
-            line-height: 1.5; 
-            color: #1e293b; 
-            padding-left: 20px; 
-            position: relative; 
-            z-index: 10; 
-            pointer-events: auto; 
-            max-height: 65vh; 
-            overflow-y: auto; 
-            padding-right: 15px;
-        }
-        
+        .slide-content { font-size: 38px; line-height: 1.5; color: #1e293b; padding-left: 20px; position: relative; z-index: 10; pointer-events: auto; max-height: 65vh; overflow-y: auto; padding-right: 15px; }
         .slide-content::-webkit-scrollbar { width: 8px; }
         .slide-content::-webkit-scrollbar-track { background: transparent; }
         .slide-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .slide-content::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
-
         .slide-content p strong { font-weight: 900; color: var(--primary-color); }
-        
         .text-indent, #out-cls-text { padding-left: 40px; margin-top: 10px; color: #334155; white-space: pre-wrap; }
         
         .slide-controls { position: absolute; bottom: 30px; right: 50px; display: flex; gap: 15px; z-index: 100; pointer-events: auto;}
@@ -143,10 +129,8 @@
         ========================================= */
         .slide-welcome { text-align: center; height: 100%; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
         .slide.active.slide-welcome { display: flex; align-items: center; justify-content: center; }
-        
         .welcome-content { animation: zoomIn 0.8s ease-out forwards; position: relative; z-index: 10;}
         .welcome-logo { width: 180px; margin-bottom: 20px; animation: heartbeat 2s infinite; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-        
         .welcome-title { font-size: 65px; color: var(--primary-color); font-weight: 900; margin: 0 0 15px 0; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); display: inline-block; animation: chayQuaChayLai 3s ease-in-out infinite alternate; }
         .welcome-subtitle { font-size: 45px; color: #dc2626; font-weight: 900; margin: 0 0 30px 0; text-transform: uppercase; padding: 0 20px;}
         .welcome-divider { width: 150px; border: 4px solid var(--success-color); border-radius: 5px; margin: 0 auto 30px auto; }
@@ -185,8 +169,8 @@
         <div class="chuc-nang-container">
             <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 50px; font-size: 34px;">CHỌN CHỨC NĂNG LÀM VIỆC</h2>
             <div class="grid-chuc-nang">
-                <div class="chuc-nang-card" onclick="vaoFormNhapLieu('Bệnh án')"><div class="chuc-nang-icon">📋</div><h3>BÌNH BỆNH ÁN</h3></div>
-                <div class="chuc-nang-card" onclick="vaoFormNhapLieu('Đơn thuốc')"><div class="chuc-nang-icon">💊</div><h3>BÌNH ĐƠN THUỐC</h3></div>
+                <div class="chuc-nang-card" onclick="vaoFormNhapLieu('BA')"><div class="chuc-nang-icon">📋</div><h3>BÌNH BỆNH ÁN</h3></div>
+                <div class="chuc-nang-card" onclick="vaoFormNhapLieu('DT')"><div class="chuc-nang-icon">💊</div><h3>BÌNH ĐƠN THUỐC</h3></div>
             </div>
             <div style="text-align: center; margin-top: 40px; width: 100%;">
                 <button onclick="dangXuat()" class="btn-main btn-danger" style="width: auto; padding: 12px 40px; border-radius: 30px; font-size: 16px; box-shadow: 0 4px 10px rgba(220, 38, 38, 0.2);">🚪 Đăng xuất hệ thống</button>
@@ -194,15 +178,15 @@
         </div>
     </div>
 
-    <div id="khu-vuc-nhap-lieu" style="display: none; margin-top: 30px;">
+    <div id="khu-vuc-nhap-lieu-ba" class="khu-vuc-nhap">
         <h2>NHẬP THÔNG TIN BÌNH BỆNH ÁN</h2>
-        <div class="subtitle-benh" id="hien-thi-ten-benh">TÊN BỆNH: ..........................</div>
+        <div class="subtitle-benh" id="hien-thi-ten-benh-ba">TÊN BỆNH: ..........................</div>
         
         <div class="button-group">
-            <button onclick="xuLyLuuBenhAn()" class="btn-main btn-success">💾 LƯU BỆNH ÁN</button>
+            <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU BỆNH ÁN</button>
             <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
             <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
-            <button onclick="dangXuat()" class="btn-main btn-danger">🚪 ĐĂNG XUẤT</button>
+            <button onclick="dangXuat()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
         </div>
 
         <div class="form-section" style="background-color: #fefce8; border-top-color: #f59e0b;">
@@ -214,7 +198,7 @@
                 </div>
                 <div class="form-group" style="flex: 1; min-width: 250px;">
                     <label>2. Tải File Backup Hệ Thống (.json):</label>
-                    <input type="file" id="in-file-json" accept=".json" onchange="nhapFileDuLieu(event)" style="border: 2px dashed #16a34a; padding: 10px; background: white; cursor: pointer;">
+                    <input type="file" accept=".json" onchange="nhapFileDuLieu(event)" style="border: 2px dashed #16a34a; padding: 10px; background: white; cursor: pointer;">
                 </div>
                 <div class="form-group" style="flex: 1; min-width: 250px;">
                     <label>3. Sao lưu Dữ liệu đang nhập:</label>
@@ -226,13 +210,13 @@
         <div class="form-section">
             <h3>I. Cài đặt Trình chiếu & Hành chính</h3>
             <div class="form-row">
-                <div class="form-group"><label style="color: #dc2626;">Tên Bệnh / Chẩn đoán (Bắt buộc):</label><input type="text" id="in-ten-benh" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
-                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay" value="BS. Đặng Ngọc Văn"></div>
+                <div class="form-group"><label style="color: #dc2626;">Tên Bệnh / Chẩn đoán (Bắt buộc):</label><input type="text" id="in-ten-benh-ba" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
+                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay-ba" value="BS. Đặng Ngọc Văn"></div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label>Khoa thực hiện:</label>
-                    <select id="in-khoa">
+                    <select id="in-khoa-ba">
                         <option>Khoa Cấp cứu</option>
                         <option>Khoa Ngoại - Gây mê hồi sức</option>
                         <option>Khoa Nội Tổng hợp</option>
@@ -241,43 +225,43 @@
                         <option>Khoa Chăm sóc sức khỏe sinh sản và Phụ sản - Dinh dưỡng</option>
                     </select>
                 </div>
-                <div class="form-group"><label style="color: #f59e0b;">🔑 Mật khẩu bảo vệ (Dùng để Xóa):</label><input type="text" id="in-mat-khau" placeholder="Ví dụ: 1234"></div>
+                <div class="form-group"><label style="color: #f59e0b;">🔑 Mật khẩu bảo vệ (Dùng để Xóa):</label><input type="text" id="in-mat-khau-ba" placeholder="Ví dụ: 1234"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Họ và tên bệnh nhân:</label><input type="text" id="in-ten"></div>
-                <div class="form-group"><label>Tuổi:</label><input type="text" id="in-tuoi"></div>
+                <div class="form-group"><label>Họ và tên bệnh nhân:</label><input type="text" id="in-ten-ba"></div>
+                <div class="form-group"><label>Tuổi:</label><input type="text" id="in-tuoi-ba"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Nghề nghiệp:</label><input type="text" id="in-nghe"></div>
-                <div class="form-group"><label>Địa chỉ:</label><input type="text" id="in-diachi"></div>
+                <div class="form-group"><label>Nghề nghiệp:</label><input type="text" id="in-nghe-ba"></div>
+                <div class="form-group"><label>Địa chỉ:</label><input type="text" id="in-diachi-ba"></div>
             </div>
-            <div class="form-group"><label>Lý do vào viện:</label><textarea id="in-lydo" rows="2"></textarea></div>
+            <div class="form-group"><label>Lý do vào viện:</label><textarea id="in-lydo-ba" rows="2"></textarea></div>
         </div>
 
         <div class="form-section">
             <h3>II. Bệnh sử & Tiền căn</h3>
-            <div class="form-group"><label>Bệnh sử:</label><textarea id="in-benhsu" rows="4"></textarea></div>
-            <div class="form-group"><label>Tiền căn:</label><textarea id="in-tiensu" rows="3"></textarea></div>
-            <div class="form-group"><label>Khám lâm sàng:</label><textarea id="in-khamchung" rows="4"></textarea></div>
+            <div class="form-group"><label>Bệnh sử:</label><textarea id="in-benhsu-ba" rows="4"></textarea></div>
+            <div class="form-group"><label>Tiền căn:</label><textarea id="in-tiensu-ba" rows="3"></textarea></div>
+            <div class="form-group"><label>Khám lâm sàng:</label><textarea id="in-khamchung-ba" rows="4"></textarea></div>
         </div>
 
         <div class="form-section">
             <h3>III. Kết quả Cận lâm sàng & Hình ảnh</h3>
-            <div class="form-group"><label>Văn bản (Tóm tắt XN máu, Mạch, HA...):</label><textarea id="in-cls-text" rows="3"></textarea></div>
+            <div class="form-group"><label>Văn bản (Tóm tắt XN máu, Mạch, HA...):</label><textarea id="in-cls-text-ba" rows="3"></textarea></div>
             <label>Hình ảnh Cận lâm sàng (Click Chọn hoặc dán hình bằng Ctrl+V):</label>
-            <div id="danh-sach-anh"></div>
+            <div id="danh-sach-anh-ba"></div>
             <button class="btn-add-row" onclick="themDongAnh()">+ Thêm 1 Hình ảnh & Ghi chú</button>
         </div>
 
         <div class="form-section">
             <h3>IV. Tóm tắt & Chẩn đoán</h3>
-            <div class="form-group"><label>Tóm tắt bệnh án:</label><textarea id="in-tomtat" rows="3"></textarea></div>
-            <div class="form-group"><label>Chẩn đoán xác định:</label><input type="text" id="in-chandoan"></div>
+            <div class="form-group"><label>Tóm tắt bệnh án:</label><textarea id="in-tomtat-ba" rows="3"></textarea></div>
+            <div class="form-group"><label>Chẩn đoán xác định:</label><input type="text" id="in-chandoan-ba"></div>
         </div>
 
         <div class="form-section">
             <h3>V. Diễn biến & Xử trí</h3>
-            <div id="danh-sach-dien-bien">
+            <div id="danh-sach-dien-bien-ba">
                 <div class="dynamic-row row-dienbien">
                     <div style="flex: 1;"><input type="text" class="db-thoigian" placeholder="Thời gian (VD: 07h08 13/03)"></div>
                     <div style="flex: 2;"><textarea class="db-dienbien" rows="3" placeholder="Diễn biến..."></textarea></div>
@@ -286,7 +270,62 @@
                 </div>
             </div>
             <button class="btn-add-row" onclick="themDongDienBien()">+ Thêm mốc thời gian tiếp theo</button>
-            <div class="form-group" style="margin-top: 20px;"><label>Câu hỏi Bàn luận:</label><textarea id="in-banluan" rows="3"></textarea></div>
+            <div class="form-group" style="margin-top: 20px;"><label>Câu hỏi Bàn luận:</label><textarea id="in-banluan-ba" rows="3"></textarea></div>
+        </div>
+    </div>
+
+    <div id="khu-vuc-nhap-lieu-dt" class="khu-vuc-nhap">
+        <h2>NHẬP THÔNG TIN BÌNH ĐƠN THUỐC</h2>
+        <div class="subtitle-benh" id="hien-thi-ten-benh-dt">CHẨN ĐOÁN / ĐƠN THUỐC: ..........................</div>
+        
+        <div class="button-group">
+            <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU ĐƠN THUỐC</button>
+            <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
+            <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
+            <button onclick="dangXuat()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
+        </div>
+
+        <div class="form-section" style="background-color: #fefce8; border-top-color: #16a34a;">
+            <h3 style="color: #15803d;">⚡ SAO LƯU DỮ LIỆU</h3>
+            <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>1. Tải File Backup Đơn thuốc (.json):</label>
+                    <input type="file" accept=".json" onchange="nhapFileDuLieu(event)" style="border: 2px dashed #16a34a; padding: 10px; background: white; cursor: pointer;">
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>2. Sao lưu dữ liệu đang nhập:</label>
+                    <button onclick="xuatFileDuLieu()" class="btn-main" style="background-color: #0284c7; width: 100%; padding: 12px; margin: 0;">⬇️ XUẤT FILE SAO LƯU</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>I. Cài đặt Trình chiếu & Hành chính</h3>
+            <div class="form-row">
+                <div class="form-group"><label style="color: #dc2626;">Chẩn đoán / Tên Đơn Thuốc (Bắt buộc):</label><input type="text" id="in-ten-benh-dt" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
+                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay-dt" value="BS. Đặng Ngọc Văn"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Khoa thực hiện:</label>
+                    <select id="in-khoa-dt">
+                        <option>Khoa Ngoại - Gây mê hồi sức</option>
+                        <option>Khoa Nội Tổng hợp</option>
+                        <option>Khoa Nhi</option>
+                        <option>Khoa Truyền nhiễm</option>
+                        <option>Khoa Cấp cứu</option>
+                        <option>Khoa Chăm sóc sức khỏe sinh sản và Phụ sản - Dinh dưỡng</option>
+                    </select>
+                </div>
+                <div class="form-group"><label style="color: #f59e0b;">🔑 Mật khẩu bảo vệ (Dùng để Xóa):</label><input type="text" id="in-mat-khau-dt" placeholder="Ví dụ: 1234"></div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>II. Hình ảnh Đơn thuốc</h3>
+            <label>Click Chọn hoặc dán hình ảnh (Ctrl+V):</label>
+            <div id="danh-sach-anh-dt"></div>
+            <button class="btn-add-row" onclick="themDongAnh()">+ Thêm 1 Hình ảnh & Ghi chú</button>
         </div>
     </div>
 
@@ -301,7 +340,7 @@
     
     <div id="modal-tim-kiem" class="modal-overlay">
         <div class="modal-content" style="width: 700px;">
-            <h3 style="color: var(--warning-color)">🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU</h3>
+            <h3 style="color: var(--warning-color)" id="title-modal-tim-kiem">🔍 QUẢN LÝ DỮ LIỆU ĐÃ LƯU</h3>
             <div id="danh-sach-kq" class="search-list"></div>
             <button onclick="document.getElementById('modal-tim-kiem').style.display='none'" class="btn-main" style="background:#ef4444; margin-top:20px; width:100%;">Đóng</button>
         </div>
@@ -318,57 +357,66 @@
         </div>
 
         <div id="slide-container">
-            <div class="slide slide-base slide-welcome">
+            <div class="slide slide-welcome slide-active-target">
                 <div class="welcome-content">
                     <img src="logott.png" class="welcome-logo" alt="Logo TTYT">
-                    <h1 class="welcome-title">✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨</h1>
+                    <h1 class="welcome-title" id="out-welcome-title">✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨</h1>
                     <h2 class="welcome-subtitle" id="out-khoa-welcome"></h2>
                     <hr class="welcome-divider">
                     <h3 class="welcome-footer">🏥 TRUNG TÂM Y TẾ KHU VỰC HÀM THUẬN BẮC 🏥</h3>
                 </div>
             </div>
 
-            <div class="slide slide-base">
+            <div class="slide slide-ba">
                 <div class="slide-header">📝 I. HÀNH CHÍNH & LÝ DO</div>
                 <div class="slide-content">
-                    <p><strong>BỆNH LÝ:</strong> <span id="out-ten-benh" style="color: red; text-transform: uppercase;"></span></p>
-                    <p><strong>Họ tên:</strong> <span id="out-ten" style="text-transform: uppercase;"></span> <span style="margin-left:30px;"><strong>Tuổi:</strong> <span id="out-tuoi"></span></span></p>
-                    <p><strong>Nghề nghiệp:</strong> <span id="out-nghe"></span> <span style="margin-left:30px;"><strong>Địa chỉ:</strong> <span id="out-diachi"></span></span></p>
-                    <p><strong>Lý do vào viện:</strong> <span id="out-lydo"></span></p>
+                    <p><strong>BỆNH LÝ:</strong> <span id="out-ten-benh-ba" style="color: red; text-transform: uppercase;"></span></p>
+                    <p><strong>Họ tên:</strong> <span id="out-ten-ba" style="text-transform: uppercase;"></span> <span style="margin-left:30px;"><strong>Tuổi:</strong> <span id="out-tuoi-ba"></span></span></p>
+                    <p><strong>Nghề nghiệp:</strong> <span id="out-nghe-ba"></span> <span style="margin-left:30px;"><strong>Địa chỉ:</strong> <span id="out-diachi-ba"></span></span></p>
+                    <p><strong>Lý do vào viện:</strong> <span id="out-lydo-ba"></span></p>
                 </div>
             </div>
-            <div class="slide slide-base">
+            <div class="slide slide-ba">
                 <div class="slide-header">🩺 II. BỆNH SỬ & TIỀN CĂN</div>
                 <div class="slide-content">
-                    <p><strong>1. Bệnh sử:</strong></p><p id="out-benhsu" class="text-indent"></p>
-                    <p><strong>2. Tiền căn:</strong></p><p id="out-tiensu" class="text-indent"></p>
+                    <p><strong>1. Bệnh sử:</strong></p><p id="out-benhsu-ba" class="text-indent"></p>
+                    <p><strong>2. Tiền căn:</strong></p><p id="out-tiensu-ba" class="text-indent"></p>
                 </div>
             </div>
-            <div class="slide slide-base">
+            <div class="slide slide-ba">
                 <div class="slide-header">🧑‍⚕️ III. KHÁM LÂM SÀNG</div>
-                <div class="slide-content"><p id="out-khamchung" class="text-indent"></p></div>
+                <div class="slide-content"><p id="out-khamchung-ba" class="text-indent"></p></div>
             </div>
-            <div class="slide slide-base">
+            <div class="slide slide-ba" id="slide-cls-ba">
                 <div class="slide-header">🔬 IV. CẬN LÂM SÀNG</div>
-                <div class="slide-content"><p id="out-cls-text"></p></div>
+                <div class="slide-content"><p id="out-cls-text-ba"></p></div>
             </div>
             
-            <div class="slide slide-base">
+            <div class="slide slide-ba" id="slide-tomtat-ba">
                 <div class="slide-header">📋 V. TÓM TẮT & CHẨN ĐOÁN</div>
                 <div class="slide-content">
-                    <p><strong>Tóm tắt:</strong></p><p id="out-tomtat" class="text-indent"></p>
-                    <p><strong>CHẨN ĐOÁN:</strong> <span id="out-chandoan" style="color: red; text-transform: uppercase;"></span></p>
+                    <p><strong>Tóm tắt:</strong></p><p id="out-tomtat-ba" class="text-indent"></p>
+                    <p><strong>CHẨN ĐOÁN:</strong> <span id="out-chandoan-ba" style="color: red; text-transform: uppercase;"></span></p>
                 </div>
             </div>
-            <div class="slide slide-base">
+            <div class="slide slide-ba">
                 <div class="slide-header">💊 VI. DIỄN BIẾN & XỬ TRÍ</div>
                 <div class="slide-content">
-                    <div id="out-bang-dienbien"></div> 
+                    <div id="out-bang-dienbien-ba"></div> 
                 </div>
             </div>
-            <div class="slide slide-base">
+            <div class="slide slide-ba">
                 <div class="slide-header">💡 VII. VẤN ĐỀ BÀN LUẬN</div>
-                <div class="slide-content"><p id="out-banluan" class="text-indent" style="color: #0284c7; font-weight: 900;"></p></div>
+                <div class="slide-content"><p id="out-banluan-ba" class="text-indent" style="color: #0284c7; font-weight: 900;"></p></div>
+            </div>
+
+            <div class="slide slide-dt">
+                <div class="slide-header">📝 I. THÔNG TIN ĐƠN THUỐC</div>
+                <div class="slide-content">
+                    <p style="margin-top: 40px;"><strong>THÔNG TIN CHẨN ĐOÁN / BỆNH LÝ:</strong> <span id="out-ten-benh-dt" style="color: red; text-transform: uppercase;"></span></p>
+                    <p><strong>KHOA THỰC HIỆN:</strong> <span id="out-khoa-dt-slide"></span></p>
+                    <p><strong>NGƯỜI TRÌNH BÀY:</strong> <span id="out-nguoi-tb-dt-slide"></span></p>
+                </div>
             </div>
         </div>
 
@@ -397,6 +445,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        let loaiFormHienTai = 'BA'; // 'BA' (Bệnh án) hoặc 'DT' (Đơn thuốc)
         let slideHienTai = 0;
         let danhSachSlide = [];
         let trangThaiDaLuu = false; 
@@ -409,16 +458,25 @@
         }
         
         function vaoFormNhapLieu(loai) {
-            if(loai === 'Đơn thuốc') { alert("Tính năng đang phát triển!"); return; }
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "none";
-            document.getElementById("khu-vuc-nhap-lieu").style.display = "block";
+            loaiFormHienTai = loai;
+            maHoSoHienTai = ""; // Reset mã hồ sơ
+            trangThaiDaLuu = false;
+
+            if(loai === 'BA') {
+                document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "block";
+                document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "none";
+            } else {
+                document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "none";
+                document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "block";
+            }
         }
         
         function dangXuat() { location.reload(); }
         function xoaDong(btn) { btn.parentElement.parentElement.remove(); }
 
         // ==========================================
-        // CÔNG CỤ NÉN ẢNH (CHỐNG TRÀN DATABASE)
+        // CÔNG CỤ NÉN ẢNH CHỐNG NẶNG MÁY
         // ==========================================
         function nenAnh(file, callback) {
             const reader = new FileReader();
@@ -428,10 +486,8 @@
                 img.src = event.target.result;
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200; // Chiều rộng tối đa an toàn
-                    const MAX_HEIGHT = 1200;
-                    let width = img.width;
-                    let height = img.height;
+                    const MAX_WIDTH = 1200; const MAX_HEIGHT = 1200;
+                    let width = img.width; let height = img.height;
 
                     if (width > height) {
                         if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
@@ -441,8 +497,6 @@
                     canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // Nén sang JPEG 80% chất lượng để lưu vào Firebase không bị đơ
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
                     callback(dataUrl);
                 }
@@ -450,7 +504,7 @@
         }
 
         // ==========================================
-        // KHU VỰC THÊM HÌNH ẢNH MỚI (COPY/PASTE/UPLOAD)
+        // KHU VỰC THÊM HÌNH ẢNH MỚI (COPY/PASTE)
         // ==========================================
         function themDongAnh(savedBase64 = "", savedGhiChu = "") {
             let div = document.createElement("div"); 
@@ -480,27 +534,20 @@
             let iconText = div.querySelector('.paste-icon');
             let spanText = div.querySelector('.paste-text');
 
-            if(savedBase64) {
-                iconText.style.display = 'none';
-                spanText.style.display = 'none';
-            }
+            if(savedBase64) { iconText.style.display = 'none'; spanText.style.display = 'none'; }
 
-            // Click vào ô để mở bảng chọn File truyền thống
             pasteZone.addEventListener('click', () => { fileInput.click(); });
 
-            // Khi người dùng chọn file từ cửa sổ
             fileInput.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
                     nenAnh(e.target.files[0], function(base64Str) {
-                        imgPreview.src = base64Str;
-                        imgPreview.style.display = 'block';
+                        imgPreview.src = base64Str; imgPreview.style.display = 'block';
                         base64Data.value = base64Str;
                         iconText.style.display = 'none'; spanText.style.display = 'none';
                     });
                 }
             });
 
-            // Khi người dùng bấm Ctrl + V để dán hình chụp
             pasteZone.addEventListener('paste', function(e) {
                 e.preventDefault();
                 let items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -509,8 +556,7 @@
                     if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
                         let blob = item.getAsFile();
                         nenAnh(blob, function(base64Str) {
-                            imgPreview.src = base64Str;
-                            imgPreview.style.display = 'block';
+                            imgPreview.src = base64Str; imgPreview.style.display = 'block';
                             base64Data.value = base64Str;
                             iconText.style.display = 'none'; spanText.style.display = 'none';
                         });
@@ -519,53 +565,87 @@
                 }
             });
 
-            document.getElementById("danh-sach-anh").appendChild(div);
+            // Gắn vào đúng form đang làm việc
+            let containerId = loaiFormHienTai === 'BA' ? "danh-sach-anh-ba" : "danh-sach-anh-dt";
+            document.getElementById(containerId).appendChild(div);
+        }
+
+        // Dành riêng cho bảng Diễn biến bệnh án
+        function themDongDienBien() {
+            let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+            div.innerHTML = `<div style="flex: 1;"><input type="text" class="db-thoigian" placeholder="Thời gian..."></div><div style="flex: 2;"><textarea class="db-dienbien" rows="3" placeholder="Diễn biến..."></textarea></div><div style="flex: 2;"><textarea class="db-xutri" rows="3" placeholder="Xử trí..."></textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+            document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
+        }
+
+        function capNhatTieuDeBenh() {
+            let val = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value;
+            let hienThiId = loaiFormHienTai === 'BA' ? "hien-thi-ten-benh-ba" : "hien-thi-ten-benh-dt";
+            let prefix = loaiFormHienTai === 'BA' ? "TÊN BỆNH: " : "ĐƠN THUỐC / CHẨN ĐOÁN: ";
+            document.getElementById(hienThiId).innerText = val ? prefix + val.toUpperCase() : prefix + "..........................";
+            trangThaiDaLuu = false; 
         }
 
         // ==========================================
-        // LOGIC LƯU LÊN FIREBASE (LƯU CẢ ẢNH MỚI)
+        // LOGIC LƯU LÊN FIREBASE (BA & DT)
         // ==========================================
-        function xuLyLuuBenhAn() {
-            let tenBenh = document.getElementById("in-ten-benh").value.trim();
-            let matKhau = document.getElementById("in-mat-khau").value.trim();
+        function xuLyLuuHoSo() {
+            let tenBenh = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value.trim();
+            let matKhau = document.getElementById(loaiFormHienTai === 'BA' ? "in-mat-khau-ba" : "in-mat-khau-dt").value.trim();
+            let nguoiTrinhBay = document.getElementById(loaiFormHienTai === 'BA' ? "in-nguoi-trinh-bay-ba" : "in-nguoi-trinh-bay-dt").value.trim();
+            let khoa = document.getElementById(loaiFormHienTai === 'BA' ? "in-khoa-ba" : "in-khoa-dt").value;
             
-            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh/Chẩn đoán!"); document.getElementById("in-ten-benh").focus(); return; }
-            if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm!"); document.getElementById("in-mat-khau").focus(); return; }
+            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh/Chẩn đoán!"); return; }
+            if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm!"); return; }
 
-            if(!maHoSoHienTai) maHoSoHienTai = "BA-" + new Date().getTime().toString().slice(-6);
+            if(!maHoSoHienTai) {
+                let p = loaiFormHienTai === 'BA' ? 'BA-' : 'DT-';
+                maHoSoHienTai = p + new Date().getTime().toString().slice(-6);
+            }
 
-            let arrDienBien = [];
-            document.querySelectorAll(".row-dienbien").forEach(row => {
-                arrDienBien.push({
-                    tg: row.querySelector('.db-thoigian').value,
-                    db: row.querySelector('.db-dienbien').value,
-                    xt: row.querySelector('.db-xutri').value
-                });
-            });
-
-            // Thu thập dữ liệu hình ảnh đã mã hóa Base64
+            // Thu thập hình ảnh
             let arrAnh = [];
-            document.querySelectorAll(".row-anh").forEach(row => {
+            let listAnhId = loaiFormHienTai === 'BA' ? '#danh-sach-anh-ba .row-anh' : '#danh-sach-anh-dt .row-anh';
+            document.querySelectorAll(listAnhId).forEach(row => {
                 let b64 = row.querySelector('.base64-data').value;
                 let note = row.querySelector('.txt-ghichu').value;
                 if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
             });
 
+            // Thông tin cơ bản chung
             let duLieu = {
-                id: maHoSoHienTai, khoa: document.getElementById("in-khoa").value, matKhau: matKhau, tenBenh: tenBenh,
-                nguoiTrinhBay: document.getElementById("in-nguoi-trinh-bay").value,
-                tenBN: document.getElementById("in-ten").value, tuoi: document.getElementById("in-tuoi").value,
-                nghe: document.getElementById("in-nghe").value, diaChi: document.getElementById("in-diachi").value,
-                lyDo: document.getElementById("in-lydo").value, benhSu: document.getElementById("in-benhsu").value,
-                tienSu: document.getElementById("in-tiensu").value, khamChung: document.getElementById("in-khamchung").value,
-                clsText: document.getElementById("in-cls-text").value, tomtat: document.getElementById("in-tomtat").value,
-                chandoan: document.getElementById("in-chandoan").value, banluan: document.getElementById("in-banluan").value,
-                dienBienList: arrDienBien,
-                danhSachAnh: arrAnh, // LƯU MẢNG HÌNH ẢNH LÊN MÁY CHỦ
-                ngayTao: new Date().toLocaleString('vi-VN')
+                id: maHoSoHienTai, khoa: khoa, matKhau: matKhau, tenBenh: tenBenh,
+                nguoiTrinhBay: nguoiTrinhBay, danhSachAnh: arrAnh,
+                loaiForm: loaiFormHienTai, ngayTao: new Date().toLocaleString('vi-VN')
             };
 
-            db.ref('DanhSachBenhAn/' + maHoSoHienTai).set(duLieu)
+            // Nếu là Bệnh Án thì lấy thêm 1 nùi thông tin khác
+            if (loaiFormHienTai === 'BA') {
+                let arrDienBien = [];
+                document.querySelectorAll(".row-dienbien").forEach(row => {
+                    arrDienBien.push({
+                        tg: row.querySelector('.db-thoigian').value,
+                        db: row.querySelector('.db-dienbien').value,
+                        xt: row.querySelector('.db-xutri').value
+                    });
+                });
+                
+                duLieu.tenBN = document.getElementById("in-ten-ba").value;
+                duLieu.tuoi = document.getElementById("in-tuoi-ba").value;
+                duLieu.nghe = document.getElementById("in-nghe-ba").value;
+                duLieu.diaChi = document.getElementById("in-diachi-ba").value;
+                duLieu.lyDo = document.getElementById("in-lydo-ba").value;
+                duLieu.benhSu = document.getElementById("in-benhsu-ba").value;
+                duLieu.tienSu = document.getElementById("in-tiensu-ba").value;
+                duLieu.khamChung = document.getElementById("in-khamchung-ba").value;
+                duLieu.clsText = document.getElementById("in-cls-text-ba").value;
+                duLieu.tomtat = document.getElementById("in-tomtat-ba").value;
+                duLieu.chandoan = document.getElementById("in-chandoan-ba").value;
+                duLieu.banluan = document.getElementById("in-banluan-ba").value;
+                duLieu.dienBienList = arrDienBien;
+            }
+
+            let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn/' : 'DanhSachDonThuoc/';
+            db.ref(path + maHoSoHienTai).set(duLieu)
                 .then(() => {
                     document.getElementById("modal-ma-ba").innerText = maHoSoHienTai;
                     document.getElementById("modal-luu").style.display = "flex";
@@ -574,15 +654,19 @@
                 .catch((error) => { alert("❌ Lỗi khi lưu lên máy chủ: " + error.message); });
         }
 
+        // ==========================================
+        // TÌM KIẾM THEO CHUYÊN MỤC
+        // ==========================================
         function moModalTimKiem() {
             document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center; color:#0284c7;'>⏳ Đang tải dữ liệu từ máy chủ...</p>";
+            document.getElementById("title-modal-tim-kiem").innerText = loaiFormHienTai === 'BA' ? "🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU" : "🔍 QUẢN LÝ ĐƠN THUỐC ĐÃ LƯU";
             document.getElementById("modal-tim-kiem").style.display = "flex";
 
-            db.ref('DanhSachBenhAn').get().then((snapshot) => {
+            let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn' : 'DanhSachDonThuoc';
+            db.ref(path).get().then((snapshot) => {
                 if (snapshot.exists()) {
                     let data = snapshot.val();
                     duLieuTamThoi = Object.values(data);
-                    
                     let h = "";
                     duLieuTamThoi.reverse().forEach(ba => {
                         h += `
@@ -596,7 +680,7 @@
                     });
                     document.getElementById("danh-sach-kq").innerHTML = h;
                 } else {
-                    document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center;'>Chưa có bệnh án nào trên hệ thống.</p>";
+                    document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center;'>Chưa có dữ liệu nào trên hệ thống.</p>";
                 }
             }).catch((error) => {
                 document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center; color:red;'>Lỗi kết nối máy chủ!</p>";
@@ -616,7 +700,8 @@
 
             let xacNhan = confirm(`⚠️ Bạn có chắc chắn XÓA VĨNH VIỄN hồ sơ [${id}] khỏi hệ thống trực tuyến không?`);
             if(xacNhan) {
-                db.ref('DanhSachBenhAn/' + id).remove()
+                let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn/' : 'DanhSachDonThuoc/';
+                db.ref(path + id).remove()
                     .then(() => {
                         alert("Đã xóa hồ sơ thành công!");
                         if(maHoSoHienTai === id) maHoSoHienTai = "";
@@ -627,44 +712,47 @@
         }
 
         // ==========================================
-        // PHỤC HỒI LẠI HÌNH ẢNH KHI TẢI TỪ MÁY CHỦ
+        // PHỤC HỒI LẠI DỮ LIỆU TỪ MÁY CHỦ
         // ==========================================
         function taiDuLieu(id) {
             let ba = duLieuTamThoi.find(x => x.id === id);
             if(ba) {
                 maHoSoHienTai = ba.id;
-                document.getElementById("in-khoa").value = ba.khoa;
-                document.getElementById("in-mat-khau").value = ba.matKhau || "";
-                document.getElementById("in-ten-benh").value = ba.tenBenh;
-                document.getElementById("in-nguoi-trinh-bay").value = ba.nguoiTrinhBay;
-                document.getElementById("in-ten").value = ba.tenBN;
-                document.getElementById("in-tuoi").value = ba.tuoi;
-                document.getElementById("in-nghe").value = ba.nghe;
-                document.getElementById("in-diachi").value = ba.diaChi;
-                document.getElementById("in-lydo").value = ba.lyDo;
-                document.getElementById("in-benhsu").value = ba.benhSu;
-                document.getElementById("in-tiensu").value = ba.tienSu;
-                document.getElementById("in-khamchung").value = ba.khamChung;
-                document.getElementById("in-cls-text").value = ba.clsText;
-                document.getElementById("in-tomtat").value = ba.tomtat;
-                document.getElementById("in-chandoan").value = ba.chandoan;
-                document.getElementById("in-banluan").value = ba.banluan;
+                let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+                
+                document.getElementById("in-khoa" + s).value = ba.khoa;
+                document.getElementById("in-mat-khau" + s).value = ba.matKhau || "";
+                document.getElementById("in-ten-benh" + s).value = ba.tenBenh;
+                document.getElementById("in-nguoi-trinh-bay" + s).value = ba.nguoiTrinhBay;
 
-                document.getElementById("danh-sach-dien-bien").innerHTML = "";
-                if(ba.dienBienList) {
-                    ba.dienBienList.forEach(item => {
-                        let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                        div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
-                        document.getElementById("danh-sach-dien-bien").appendChild(div);
-                    });
+                if(loaiFormHienTai === 'BA') {
+                    document.getElementById("in-ten-ba").value = ba.tenBN || "";
+                    document.getElementById("in-tuoi-ba").value = ba.tuoi || "";
+                    document.getElementById("in-nghe-ba").value = ba.nghe || "";
+                    document.getElementById("in-diachi-ba").value = ba.diaChi || "";
+                    document.getElementById("in-lydo-ba").value = ba.lyDo || "";
+                    document.getElementById("in-benhsu-ba").value = ba.benhSu || "";
+                    document.getElementById("in-tiensu-ba").value = ba.tienSu || "";
+                    document.getElementById("in-khamchung-ba").value = ba.khamChung || "";
+                    document.getElementById("in-cls-text-ba").value = ba.clsText || "";
+                    document.getElementById("in-tomtat-ba").value = ba.tomtat || "";
+                    document.getElementById("in-chandoan-ba").value = ba.chandoan || "";
+                    document.getElementById("in-banluan-ba").value = ba.banluan || "";
+
+                    document.getElementById("danh-sach-dien-bien-ba").innerHTML = "";
+                    if(ba.dienBienList) {
+                        ba.dienBienList.forEach(item => {
+                            let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                            document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
+                        });
+                    }
                 }
 
                 // Tải lại toàn bộ hình ảnh
-                document.getElementById("danh-sach-anh").innerHTML = "";
+                document.getElementById("danh-sach-anh" + s).innerHTML = "";
                 if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
-                    ba.danhSachAnh.forEach(anh => {
-                        themDongAnh(anh.base64, anh.ghiChu);
-                    });
+                    ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
                 }
 
                 capNhatTieuDeBenh(); trangThaiDaLuu = true; 
@@ -673,52 +761,77 @@
         }
 
         // ==========================================
-        // CẬP NHẬT TRÌNH CHIẾU DÙNG HÌNH ĐÃ LƯU
+        // CẬP NHẬT TRÌNH CHIẾU THÔNG MINH CHO CẢ 2 LOẠI
         // ==========================================
         function batDauTrinhChieu() {
-            if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU BỆNH ÁN LÊN HỆ THỐNG!"); return; }
+            if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU DỮ LIỆU LÊN HỆ THỐNG!"); return; }
 
-            document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa").value.toUpperCase();
-            document.getElementById("out-ten-benh").innerText = document.getElementById("in-ten-benh").value;
-            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay").value;
-            document.getElementById("out-ten").innerText = document.getElementById("in-ten").value;
-            document.getElementById("out-tuoi").innerText = document.getElementById("in-tuoi").value;
-            document.getElementById("out-nghe").innerText = document.getElementById("in-nghe").value;
-            document.getElementById("out-diachi").innerText = document.getElementById("in-diachi").value;
-            document.getElementById("out-lydo").innerText = document.getElementById("in-lydo").value;
-            document.getElementById("out-benhsu").innerText = document.getElementById("in-benhsu").value;
-            document.getElementById("out-tiensu").innerText = document.getElementById("in-tiensu").value;
-            document.getElementById("out-khamchung").innerText = document.getElementById("in-khamchung").value;
-            document.getElementById("out-cls-text").innerText = document.getElementById("in-cls-text").value;
-            document.getElementById("out-tomtat").innerText = document.getElementById("in-tomtat").value;
-            document.getElementById("out-chandoan").innerText = document.getElementById("in-chandoan").value;
-            document.getElementById("out-banluan").innerText = document.getElementById("in-banluan").value;
+            // 1. Set text chung cho màn Welcome và Presenter Box
+            let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+            document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa" + s).value.toUpperCase();
+            document.getElementById("out-welcome-title").innerText = loaiFormHienTai === 'BA' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨" : "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH ĐƠN THUỐC ✨";
+            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay" + s).value;
 
-            let htmlBang = `<table class="tb-dienbien"><tr><th>THỜI GIAN</th><th>DIỄN BIẾN</th><th>XỬ TRÍ</th></tr>`;
-            document.querySelectorAll(".row-dienbien").forEach(row => {
-                let tg = row.querySelector('.db-thoigian').value;
-                let db = row.querySelector('.db-dienbien').value.replace(/\n/g, "<br>");
-                let xt = row.querySelector('.db-xutri').value.replace(/\n/g, "<br>");
-                if(tg || db || xt) htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
+            // Xóa tất cả đánh dấu slide hiển thị
+            document.querySelectorAll('.slide').forEach(e => {
+                e.classList.remove('slide-active-target');
+                e.style.display = 'none'; // Giấu hết toàn bộ
             });
-            htmlBang += `</table>`;
-            document.getElementById("out-bang-dienbien").innerHTML = htmlBang;
+            document.querySelector('.slide-welcome').classList.add('slide-active-target');
 
+            // 2. Lắp ráp dữ liệu tùy theo Loại
+            if(loaiFormHienTai === 'BA') {
+                document.getElementById("out-ten-benh-ba").innerText = document.getElementById("in-ten-benh-ba").value;
+                document.getElementById("out-ten-ba").innerText = document.getElementById("in-ten-ba").value;
+                document.getElementById("out-tuoi-ba").innerText = document.getElementById("in-tuoi-ba").value;
+                document.getElementById("out-nghe-ba").innerText = document.getElementById("in-nghe-ba").value;
+                document.getElementById("out-diachi-ba").innerText = document.getElementById("in-diachi-ba").value;
+                document.getElementById("out-lydo-ba").innerText = document.getElementById("in-lydo-ba").value;
+                document.getElementById("out-benhsu-ba").innerText = document.getElementById("in-benhsu-ba").value;
+                document.getElementById("out-tiensu-ba").innerText = document.getElementById("in-tiensu-ba").value;
+                document.getElementById("out-khamchung-ba").innerText = document.getElementById("in-khamchung-ba").value;
+                document.getElementById("out-cls-text-ba").innerText = document.getElementById("in-cls-text-ba").value;
+                document.getElementById("out-tomtat-ba").innerText = document.getElementById("in-tomtat-ba").value;
+                document.getElementById("out-chandoan-ba").innerText = document.getElementById("in-chandoan-ba").value;
+                document.getElementById("out-banluan-ba").innerText = document.getElementById("in-banluan-ba").value;
+
+                let htmlBang = `<table class="tb-dienbien"><tr><th>THỜI GIAN</th><th>DIỄN BIẾN</th><th>XỬ TRÍ</th></tr>`;
+                document.querySelectorAll(".row-dienbien").forEach(row => {
+                    let tg = row.querySelector('.db-thoigian').value;
+                    let db = row.querySelector('.db-dienbien').value.replace(/\n/g, "<br>");
+                    let xt = row.querySelector('.db-xutri').value.replace(/\n/g, "<br>");
+                    if(tg || db || xt) htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
+                });
+                htmlBang += `</table>`;
+                document.getElementById("out-bang-dienbien-ba").innerHTML = htmlBang;
+
+                // Kích hoạt các slide của BA
+                document.querySelectorAll('.slide-ba').forEach(e => e.classList.add('slide-active-target'));
+            } else {
+                document.getElementById("out-ten-benh-dt").innerText = document.getElementById("in-ten-benh-dt").value;
+                document.getElementById("out-khoa-dt-slide").innerText = document.getElementById("in-khoa-dt").value;
+                document.getElementById("out-nguoi-tb-dt-slide").innerText = document.getElementById("in-nguoi-trinh-bay-dt").value;
+
+                // Kích hoạt các slide của Đơn Thuốc
+                document.querySelectorAll('.slide-dt').forEach(e => e.classList.add('slide-active-target'));
+            }
+
+            // 3. Đổ hình ảnh vào slide
             document.querySelectorAll('.slide-anh-dong').forEach(e => e.remove());
-            let anhRows = document.querySelectorAll('.row-anh');
-            let slideIndexInsert = 5; 
             let container = document.getElementById("slide-container");
+            let anhRows = document.querySelectorAll('#danh-sach-anh' + s + ' .row-anh');
 
             for(let row of anhRows) {
-                // Đọc hình ảnh đã được lưu trong hidden text area thay vì input file
                 let base64 = row.querySelector('.base64-data').value;
                 let ghiChu = row.querySelector('.txt-ghichu').value;
                 
                 if (base64) {
                     let newSlide = document.createElement('div');
-                    newSlide.className = 'slide slide-anh-dong';
+                    newSlide.className = 'slide slide-anh-dong slide-active-target'; 
+                    // CHỈNH SỬA TÊN HEADER Ở ĐÂY
+                    let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
                     newSlide.innerHTML = `
-                        <div class="slide-header">📸 IV. HÌNH ẢNH CẬN LÂM SÀNG</div>
+                        <div class="slide-header">${titleStr}</div>
                         <div class="slide-content" style="height: 100%; display: flex; flex-direction: column;">
                             <div class="slide-image-container">
                                 <img src="${base64}">
@@ -726,29 +839,41 @@
                             </div>
                         </div>
                     `;
-                    container.insertBefore(newSlide, container.children[slideIndexInsert]);
-                    slideIndexInsert++; 
+                    
+                    if(loaiFormHienTai === 'BA') {
+                        container.insertBefore(newSlide, document.getElementById('slide-tomtat-ba'));
+                    } else {
+                        container.appendChild(newSlide);
+                    }
                 }
             }
 
-            document.getElementById("khu-vuc-nhap-lieu").style.display = "none";
+            // Mở màn hình chiếu
+            document.querySelector(".khu-vuc-nhap[style*='display: block']").style.display = "none";
             document.getElementById("khu-vuc-trinh-chieu").style.display = "block";
             let elem = document.documentElement; if (elem.requestFullscreen) elem.requestFullscreen();
 
-            danhSachSlide = document.getElementsByClassName("slide"); 
+            // Chỉ lọc và chiếu những Slide đã được Tag 'slide-active-target'
+            danhSachSlide = document.querySelectorAll(".slide-active-target"); 
             slideHienTai = 0;
             hienThiSlide(slideHienTai);
         }
 
         function ketThucTrinhChieu() {
             document.getElementById("khu-vuc-trinh-chieu").style.display = "none";
-            document.getElementById("khu-vuc-nhap-lieu").style.display = "block";
+            document.getElementById(loaiFormHienTai === 'BA' ? "khu-vuc-nhap-lieu-ba" : "khu-vuc-nhap-lieu-dt").style.display = "block";
             if (document.exitFullscreen) document.exitFullscreen();
         }
 
         function hienThiSlide(n) {
-            for (let i = 0; i < danhSachSlide.length; i++) danhSachSlide[i].classList.remove("active"); 
-            if(danhSachSlide[n]) danhSachSlide[n].classList.add("active"); 
+            for (let i = 0; i < danhSachSlide.length; i++) {
+                danhSachSlide[i].classList.remove("active");
+                danhSachSlide[i].style.display = 'none'; // Giấu đi
+            }
+            if(danhSachSlide[n]) {
+                danhSachSlide[n].classList.add("active"); 
+                danhSachSlide[n].style.display = 'block'; // Chỉ hiện cái active
+            }
         }
 
         function chuyenSlide(buoc) {
@@ -761,33 +886,22 @@
         document.addEventListener('keydown', function(event) {
             if (document.getElementById("khu-vuc-trinh-chieu").style.display === "block") {
                 if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " " || event.key === "Enter") {
-                    event.preventDefault(); 
-                    chuyenSlide(1);
-                }
-                else if (event.key === "ArrowLeft" || event.key === "PageUp") {
-                    event.preventDefault();
-                    chuyenSlide(-1);
-                }
-                else if (event.key === "Escape") {
-                    ketThucTrinhChieu();
-                }
+                    event.preventDefault(); chuyenSlide(1);
+                } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+                    event.preventDefault(); chuyenSlide(-1);
+                } else if (event.key === "Escape") { ketThucTrinhChieu(); }
             }
         });
 
         document.getElementById("khu-vuc-trinh-chieu").addEventListener("click", function(e) {
             if(e.target.tagName === 'BUTTON') return;
-            let clickX = e.clientX;
-            let screenWidth = window.innerWidth;
+            let clickX = e.clientX; let screenWidth = window.innerWidth;
             if(clickX > screenWidth / 2) chuyenSlide(1); else chuyenSlide(-1);
         });
 
-        function capNhatTieuDeBenh() {
-            let val = document.getElementById("in-ten-benh").value;
-            document.getElementById("hien-thi-ten-benh").innerText = val ? "TÊN BỆNH: " + val.toUpperCase() : "TÊN BỆNH: ..........................";
-            trangThaiDaLuu = false; 
-        }
-
-        // HÀM ĐỌC FILE XML BHYT CỦA BỘ Y TẾ
+        // ==========================================
+        // IMPORT/EXPORT SAO LƯU (.JSON VÀ XML BHYT)
+        // ==========================================
         function docFileXMLHoso(event) {
             let file = event.target.files[0];
             if (!file) return;
@@ -829,12 +943,13 @@
 
                     let tenBenhChuan = tenBenh.split(';')[0]; 
 
-                    document.getElementById("in-ten").value = hoTen;
-                    document.getElementById("in-tuoi").value = tuoi;
-                    document.getElementById("in-diachi").value = diaChi;
-                    document.getElementById("in-ten-benh").value = tenBenhChuan;
-                    document.getElementById("in-chandoan").value = tenBenh;
-                    document.getElementById("in-lydo").value = lyDoVaoVien; 
+                    // Đổ dữ liệu vào Form Bệnh Án
+                    document.getElementById("in-ten-ba").value = hoTen;
+                    document.getElementById("in-tuoi-ba").value = tuoi;
+                    document.getElementById("in-diachi-ba").value = diaChi;
+                    document.getElementById("in-ten-benh-ba").value = tenBenhChuan;
+                    document.getElementById("in-chandoan-ba").value = tenBenh;
+                    document.getElementById("in-lydo-ba").value = lyDoVaoVien; 
                     
                     capNhatTieuDeBenh();
                     alert("✅ Đã tải thành công hồ sơ bệnh nhân: " + hoTen);
@@ -847,50 +962,54 @@
             reader.readAsText(file);
         }
 
-        // HÀM XUẤT FILE SAO LƯU (.JSON)
         function xuatFileDuLieu() {
-            let tenBenh = document.getElementById("in-ten-benh").value.trim();
-            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Chẩn đoán trước khi xuất file!"); document.getElementById("in-ten-benh").focus(); return; }
+            let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+            let tenBenh = document.getElementById("in-ten-benh" + s).value.trim();
+            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Chẩn đoán trước khi xuất file!"); document.getElementById("in-ten-benh" + s).focus(); return; }
 
-            let arrDienBien = [];
-            document.querySelectorAll(".row-dienbien").forEach(row => {
-                arrDienBien.push({
-                    tg: row.querySelector('.db-thoigian').value,
-                    db: row.querySelector('.db-dienbien').value,
-                    xt: row.querySelector('.db-xutri').value
-                });
-            });
-
-            // Gói cả hình ảnh vào file Backup
             let arrAnh = [];
-            document.querySelectorAll(".row-anh").forEach(row => {
+            document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
                 let b64 = row.querySelector('.base64-data').value;
                 let note = row.querySelector('.txt-ghichu').value;
                 if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
             });
 
             let duLieu = {
-                khoa: document.getElementById("in-khoa").value, matKhau: document.getElementById("in-mat-khau").value, 
-                tenBenh: tenBenh, nguoiTrinhBay: document.getElementById("in-nguoi-trinh-bay").value,
-                tenBN: document.getElementById("in-ten").value, tuoi: document.getElementById("in-tuoi").value,
-                nghe: document.getElementById("in-nghe").value, diaChi: document.getElementById("in-diachi").value,
-                lyDo: document.getElementById("in-lydo").value, benhSu: document.getElementById("in-benhsu").value,
-                tienSu: document.getElementById("in-tiensu").value, khamChung: document.getElementById("in-khamchung").value,
-                clsText: document.getElementById("in-cls-text").value, tomtat: document.getElementById("in-tomtat").value,
-                chandoan: document.getElementById("in-chandoan").value, banluan: document.getElementById("in-banluan").value,
-                dienBienList: arrDienBien, danhSachAnh: arrAnh
+                khoa: document.getElementById("in-khoa" + s).value, matKhau: document.getElementById("in-mat-khau" + s).value, 
+                tenBenh: tenBenh, nguoiTrinhBay: document.getElementById("in-nguoi-trinh-bay" + s).value,
+                loaiForm: loaiFormHienTai, danhSachAnh: arrAnh
             };
+
+            if(loaiFormHienTai === 'BA') {
+                let arrDienBien = [];
+                document.querySelectorAll(".row-dienbien").forEach(row => {
+                    arrDienBien.push({ tg: row.querySelector('.db-thoigian').value, db: row.querySelector('.db-dienbien').value, xt: row.querySelector('.db-xutri').value });
+                });
+                
+                duLieu.tenBN = document.getElementById("in-ten-ba").value;
+                duLieu.tuoi = document.getElementById("in-tuoi-ba").value;
+                duLieu.nghe = document.getElementById("in-nghe-ba").value;
+                duLieu.diaChi = document.getElementById("in-diachi-ba").value;
+                duLieu.lyDo = document.getElementById("in-lydo-ba").value;
+                duLieu.benhSu = document.getElementById("in-benhsu-ba").value;
+                duLieu.tienSu = document.getElementById("in-tiensu-ba").value;
+                duLieu.khamChung = document.getElementById("in-khamchung-ba").value;
+                duLieu.clsText = document.getElementById("in-cls-text-ba").value;
+                duLieu.tomtat = document.getElementById("in-tomtat-ba").value;
+                duLieu.chandoan = document.getElementById("in-chandoan-ba").value;
+                duLieu.banluan = document.getElementById("in-banluan-ba").value;
+                duLieu.dienBienList = arrDienBien;
+            }
 
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(duLieu, null, 2));
             let downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            let tenBN_File = document.getElementById("in-ten").value.trim();
-            if(!tenBN_File) tenBN_File = "KhongTen";
-            downloadAnchorNode.setAttribute("download", "Backup_HSBA_" + tenBN_File.replace(/\s/g, "_") + ".json");
+            let prefix = loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : 'Backup_DonThuoc_';
+            let nameFile = tenBenh.replace(/\s/g, "_");
+            downloadAnchorNode.setAttribute("download", prefix + nameFile + ".json");
             document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove();
         }
 
-        // HÀM NHẬP FILE SAO LƯU
         function nhapFileDuLieu(event) {
             let file = event.target.files[0];
             if (!file) return;
@@ -899,35 +1018,43 @@
             reader.onload = function(e) {
                 try {
                     let ba = JSON.parse(e.target.result);
+                    let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
                     
-                    document.getElementById("in-khoa").value = ba.khoa || "";
-                    document.getElementById("in-mat-khau").value = ba.matKhau || "";
-                    document.getElementById("in-ten-benh").value = ba.tenBenh || "";
-                    document.getElementById("in-nguoi-trinh-bay").value = ba.nguoiTrinhBay || "";
-                    document.getElementById("in-ten").value = ba.tenBN || "";
-                    document.getElementById("in-tuoi").value = ba.tuoi || "";
-                    document.getElementById("in-nghe").value = ba.nghe || "";
-                    document.getElementById("in-diachi").value = ba.diaChi || "";
-                    document.getElementById("in-lydo").value = ba.lyDo || "";
-                    document.getElementById("in-benhsu").value = ba.benhSu || "";
-                    document.getElementById("in-tiensu").value = ba.tienSu || "";
-                    document.getElementById("in-khamchung").value = ba.khamChung || "";
-                    document.getElementById("in-cls-text").value = ba.clsText || "";
-                    document.getElementById("in-tomtat").value = ba.tomtat || "";
-                    document.getElementById("in-chandoan").value = ba.chandoan || "";
-                    document.getElementById("in-banluan").value = ba.banluan || "";
+                    if(ba.loaiForm && ba.loaiForm !== loaiFormHienTai) {
+                        alert(`❌ File này là của ${ba.loaiForm === 'BA' ? 'Bệnh án' : 'Đơn thuốc'}, bạn đang ở mục khác!`);
+                        return;
+                    }
 
-                    document.getElementById("danh-sach-dien-bien").innerHTML = "";
-                    if(ba.dienBienList && ba.dienBienList.length > 0) {
-                        ba.dienBienList.forEach(item => {
-                            let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
-                            document.getElementById("danh-sach-dien-bien").appendChild(div);
-                        });
-                    } else { themDongDienBien(); }
+                    document.getElementById("in-khoa" + s).value = ba.khoa || "";
+                    document.getElementById("in-mat-khau" + s).value = ba.matKhau || "";
+                    document.getElementById("in-ten-benh" + s).value = ba.tenBenh || "";
+                    document.getElementById("in-nguoi-trinh-bay" + s).value = ba.nguoiTrinhBay || "";
 
-                    // Phục hồi hình ảnh từ file Backup
-                    document.getElementById("danh-sach-anh").innerHTML = "";
+                    if(loaiFormHienTai === 'BA') {
+                        document.getElementById("in-ten-ba").value = ba.tenBN || "";
+                        document.getElementById("in-tuoi-ba").value = ba.tuoi || "";
+                        document.getElementById("in-nghe-ba").value = ba.nghe || "";
+                        document.getElementById("in-diachi-ba").value = ba.diaChi || "";
+                        document.getElementById("in-lydo-ba").value = ba.lyDo || "";
+                        document.getElementById("in-benhsu-ba").value = ba.benhSu || "";
+                        document.getElementById("in-tiensu-ba").value = ba.tienSu || "";
+                        document.getElementById("in-khamchung-ba").value = ba.khamChung || "";
+                        document.getElementById("in-cls-text-ba").value = ba.clsText || "";
+                        document.getElementById("in-tomtat-ba").value = ba.tomtat || "";
+                        document.getElementById("in-chandoan-ba").value = ba.chandoan || "";
+                        document.getElementById("in-banluan-ba").value = ba.banluan || "";
+
+                        document.getElementById("danh-sach-dien-bien-ba").innerHTML = "";
+                        if(ba.dienBienList && ba.dienBienList.length > 0) {
+                            ba.dienBienList.forEach(item => {
+                                let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
+                                div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                                document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
+                            });
+                        } else { themDongDienBien(); }
+                    }
+
+                    document.getElementById("danh-sach-anh" + s).innerHTML = "";
                     if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
                         ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
                     }
