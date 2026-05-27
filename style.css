@@ -335,3 +335,20 @@
     .presenter-name {
         line-height: 1.3;
     }
+    /* =========================================
+           5. CSS DÀNH CHO XUẤT PDF (MẸO LAYER ẨN)
+        ========================================= */
+        #pdf-export-container { 
+            display: none; 
+            width: 210mm; 
+            /* Bỏ padding ở đây để thư viện tự động căn lề */
+            background: #ffffff; 
+            color: black; 
+            font-family: 'Times New Roman', Times, serif; 
+            /* THAY ĐỔI QUAN TRỌNG: Dùng absolute thay vì fixed */
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 100; 
+            box-sizing: border-box; 
+        }

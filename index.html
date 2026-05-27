@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Hệ Thống Bình Bệnh Án & Đơn Thuốc - Trung tâm Y tế khu vực Hàm Thuận Bắc</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* =========================================
            1. THIẾT LẬP CƠ BẢN & MÀU SẮC
@@ -50,13 +51,14 @@
         .btn-add-row { background-color: #f1f5f9; color: var(--primary-color); border: 1px dashed var(--primary-color); padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px;}
         .btn-delete-row { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;}
 
-        .button-group { display: flex; gap: 10px; margin-bottom: 30px; }
+        .button-group { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap;}
         button.btn-main { padding: 14px 15px; font-size: 16px; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; color: white; flex: 1; opacity: 1 !important; transition: all 0.2s;}
         button.btn-main:hover { filter: brightness(0.9); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
         .btn-success { background-color: var(--success-color); }
         .btn-primary { background-color: var(--primary-color); }
         .btn-warning { background-color: var(--warning-color); }
         .btn-danger { background-color: #dc2626; }
+        .btn-pdf { background-color: #be123c; } /* Màu nút PDF */
 
         /* =========================================
            KHU VỰC PASTE ẢNH
@@ -149,9 +151,49 @@
         .slide.active .slide-content > p:nth-child(3) { animation-delay: 0.3s; }
         .slide.active .slide-content > p:nth-child(4) { animation-delay: 0.4s; }
         .slide.active .slide-content > table { animation-delay: 0.3s; }
+
+        /* =========================================
+           7. CSS MẪU PDF (ẨN TRÊN MÀN HÌNH - XUẤT MỚI THẤY)
+        ========================================= */
+        #pdf-export-container { 
+            display: none; 
+            width: 210mm; 
+            min-height: 297mm; 
+            padding: 15mm 20mm; 
+            background: white; 
+            color: black; 
+            font-family: 'Times New Roman', Times, serif; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 9990; 
+            box-sizing: border-box; 
+        }
+        .pdf-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .pdf-header-left { text-align: center; font-weight: bold; font-size: 14px; }
+        .pdf-header-right { text-align: center; font-weight: bold; font-size: 14px; }
+        .pdf-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; text-transform: uppercase; }
+        .pdf-section { margin-bottom: 15px; font-size: 15px; line-height: 1.5; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 8px; text-align: left; }
+        .pdf-table th { text-align: center; font-weight: bold; background-color: #f2f2f2; }
+        .avoid-break { page-break-inside: avoid; }
+        .pdf-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.04); font-weight: bold; z-index: 0; pointer-events: none; white-space: nowrap;}
+        .pdf-text-block { white-space: pre-wrap; word-break: break-word; display: inline-block; width: 100%; vertical-align: top;}
+
+        /* Hiệu ứng Màn hình Loading khi xuất file */
+        #pdf-loader { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #be123c; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+    <div id="pdf-loader">
+        <div class="spinner"></div>
+        <h2 style="color: #be123c; margin-top: 20px; font-weight: 800;">ĐANG XUẤT FILE PDF...</h2>
+        <p style="color: #64748b; font-weight: 600;">Hệ thống đang kết xuất dữ liệu và tải hình ảnh. Xin vui lòng chờ.</p>
+    </div>
 
     <div id="khu-vuc-dang-nhap" class="auth-container">
         <div class="auth-box">
@@ -185,11 +227,12 @@
         <div class="button-group">
             <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU BỆNH ÁN</button>
             <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
+            <button onclick="xuatPDFBenhAn()" class="btn-main btn-pdf">📄 XUẤT PDF</button>
             <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
             <button onclick="quayLaiMenu()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
         </div>
 
-        <div class="form-section" style="background-color: #fefce8; border-top-color: #f59e0b;">
+        <div class="form-section" style="display: none; background-color: #fefce8; border-top-color: #f59e0b;">
             <h3 style="color: #d97706;">⚡ QUẢN LÝ & TẢI DỮ LIỆU TỪ FILE</h3>
             <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
                 <div class="form-group" style="flex: 1; min-width: 250px;">
@@ -211,7 +254,7 @@
             <h3>I. Cài đặt Trình chiếu & Hành chính</h3>
             <div class="form-row">
                 <div class="form-group"><label style="color: #dc2626;">Tên Bệnh / Chẩn đoán (Bắt buộc):</label><input type="text" id="in-ten-benh-ba" class="highlight-input" oninput="capNhatTieuDeBenh()"></div>
-                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay-ba" value="BS. Đặng Ngọc Văn"></div>
+                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay-ba" value="BS. ....."></div>
             </div>
             <div class="form-row">
                 <div class="form-group">
@@ -281,11 +324,12 @@
         <div class="button-group">
             <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU ĐƠN THUỐC</button>
             <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
+            <button onclick="xuatPDFDonThuoc()" class="btn-main btn-pdf">📄 XUẤT PDF</button>
             <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
             <button onclick="quayLaiMenu()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
         </div>
 
-        <div class="form-section" style="background-color: #fefce8; border-top-color: #16a34a;">
+        <div class="form-section" style="display: none; background-color: #fefce8; border-top-color: #16a34a;">
             <h3 style="color: #15803d;">⚡ SAO LƯU DỮ LIỆU</h3>
             <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
                 <div class="form-group" style="flex: 1; min-width: 250px;">
@@ -427,6 +471,95 @@
         </div>
     </div>
 
+    <div id="pdf-export-container">
+        <div id="pdf-template-ba" style="display:none; position: relative;">
+            <div class="pdf-watermark">TTYT KV HÀM THUẬN BẮC</div>
+            <div class="pdf-header">
+                <div class="pdf-header-left">
+                    SỞ Y TẾ LÂM ĐỒNG<br>
+                    <strong>TTYT KV HÀM THUẬN BẮC</strong><br>
+                    Khoa: <span id="pdf-ba-khoa"></span>
+                </div>
+                <div class="pdf-header-right">
+                    Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam<br>
+                    Độc lập - Tự do - Hạnh phúc<br>
+                    <span style="font-weight: normal; font-size: 12px;">Mã BA: <span id="pdf-ba-ma"></span></span>
+                </div>
+            </div>
+            
+            <div class="pdf-title">TÓM TẮT HỒ SƠ BỆNH ÁN</div>
+            
+            <div class="pdf-section">
+                <strong>1. Họ và tên:</strong> <span id="pdf-ba-ten" style="text-transform: uppercase; font-weight: bold;"></span><br>
+                <strong>2. Tuổi:</strong> <span id="pdf-ba-tuoi"></span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <strong>Nghề nghiệp:</strong> <span id="pdf-ba-nghe"></span><br>
+                <strong>3. Địa chỉ:</strong> <span id="pdf-ba-diachi"></span><br>
+                <strong>4. Lý do vào viện:</strong> <span id="pdf-ba-lydo" class="pdf-text-block"></span><br>
+                <strong>5. Bệnh sử:</strong> <span id="pdf-ba-benhsu" class="pdf-text-block"></span><br>
+                <strong>6. Tiền căn:</strong> <span id="pdf-ba-tiensu" class="pdf-text-block"></span><br>
+                <strong>7. Khám lâm sàng:</strong> <span id="pdf-ba-kham" class="pdf-text-block"></span><br>
+                <strong>8. Cận lâm sàng:</strong> <span id="pdf-ba-cls" class="pdf-text-block"></span><br>
+                <strong>9. Tóm tắt BA:</strong> <span id="pdf-ba-tomtat" class="pdf-text-block"></span><br>
+                <strong>10. Chẩn đoán:</strong> <strong style="color:red; width: auto;"><span id="pdf-ba-chandoan"></span></strong><br>
+            </div>
+
+            <div class="avoid-break" id="pdf-ba-dienbien-container" style="display:none; margin-top: 15px;">
+                <strong>11. Diễn biến lâm sàng & Xử trí:</strong>
+                <table class="pdf-table">
+                    <thead><tr><th style="width: 15%">Thời gian</th><th style="width: 45%">Diễn biến lâm sàng</th><th style="width: 40%">Y lệnh / Xử trí</th></tr></thead>
+                    <tbody id="pdf-ba-dienbien-tbody"></tbody>
+                </table>
+            </div>
+            
+            <div class="pdf-section" style="margin-top: 15px;">
+                <strong>12. Câu hỏi bàn luận chuyên môn:</strong> <span id="pdf-ba-banluan" class="pdf-text-block" style="color: #0284c7; font-weight: bold;"></span>
+            </div>
+
+            <div id="pdf-ba-images" style="text-align: center; margin-top: 25px;"></div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 40px; text-align: center; page-break-inside: avoid;">
+                <div style="width: 250px;">
+                    <em>Ngày ...... tháng ...... năm 202...</em><br>
+                    <strong>NGƯỜI TRÌNH BÀY HỒ SƠ</strong><br>
+                    <span style="font-size: 12px; color: #64748b;">(Ký và ghi rõ họ tên)</span>
+                    <br><br><br><br>
+                    <span id="pdf-ba-bacsiky" style="font-weight: bold;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div id="pdf-template-dt" style="display:none; position: relative;">
+             <div class="pdf-header">
+                <div class="pdf-header-left">
+                    SỞ Y TẾ LÂM ĐỒNG<br>
+                    <strong>TTYT KV HÀM THUẬN BẮC</strong><br>
+                    Khoa: <span id="pdf-dt-khoa"></span>
+                </div>
+                <div class="pdf-header-right">
+                    <img src="logott.png" style="width: 50px; opacity: 0.3;"><br>
+                    <span style="font-weight: normal; font-size: 12px;">Mã ĐT: <span id="pdf-dt-ma"></span></span>
+                </div>
+            </div>
+            
+            <div class="pdf-title">HỒ SƠ BÌNH ĐƠN THUỐC</div>
+
+            <div class="pdf-section">
+                <strong>Nội dung / Chẩn đoán đơn:</strong> <strong style="color:red; width: auto;"><span id="pdf-dt-chandoan"></span></strong><br>
+            </div>
+            
+            <div id="pdf-dt-images" style="text-align: center; margin-top: 20px;"></div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 40px; text-align: center; page-break-inside: avoid;">
+                <div style="width: 250px;">
+                    <em>Ngày ...... tháng ...... năm 202...</em><br>
+                    <strong>NGƯỜI BÌNH ĐƠN THUỐC</strong><br>
+                    <br><br><br><br>
+                    <span id="pdf-dt-bacsiky" style="font-weight: bold;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 
@@ -461,14 +594,12 @@
         };
 
         function xuLyDangNhap() {
-            // Lưu trạng thái đăng nhập vào Local Storage
             localStorage.setItem("daDangNhap", "true");
             document.getElementById("khu-vuc-dang-nhap").style.display = "none";
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
         }
 
         function dangXuat() { 
-            // Xóa trạng thái đăng nhập khi nhấn Đăng xuất
             localStorage.removeItem("daDangNhap");
             location.reload(); 
         }
@@ -586,12 +717,10 @@
                 }
             });
 
-            // Gắn vào đúng form đang làm việc
             let containerId = loaiFormHienTai === 'BA' ? "danh-sach-anh-ba" : "danh-sach-anh-dt";
             document.getElementById(containerId).appendChild(div);
         }
 
-        // Dành riêng cho bảng Diễn biến bệnh án
         function themDongDienBien() {
             let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
             div.innerHTML = `<div style="flex: 1;"><input type="text" class="db-thoigian" placeholder="Thời gian..."></div><div style="flex: 2;"><textarea class="db-dienbien" rows="3" placeholder="Diễn biến..."></textarea></div><div style="flex: 2;"><textarea class="db-xutri" rows="3" placeholder="Xử trí..."></textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
@@ -623,7 +752,6 @@
                 maHoSoHienTai = p + new Date().getTime().toString().slice(-6);
             }
 
-            // Thu thập hình ảnh
             let arrAnh = [];
             let listAnhId = loaiFormHienTai === 'BA' ? '#danh-sach-anh-ba .row-anh' : '#danh-sach-anh-dt .row-anh';
             document.querySelectorAll(listAnhId).forEach(row => {
@@ -632,14 +760,12 @@
                 if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
             });
 
-            // Thông tin cơ bản chung
             let duLieu = {
                 id: maHoSoHienTai, khoa: khoa, matKhau: matKhau, tenBenh: tenBenh,
                 nguoiTrinhBay: nguoiTrinhBay, danhSachAnh: arrAnh,
                 loaiForm: loaiFormHienTai, ngayTao: new Date().toLocaleString('vi-VN')
             };
 
-            // Nếu là Bệnh Án thì lấy thêm 1 nùi thông tin khác
             if (loaiFormHienTai === 'BA') {
                 let arrDienBien = [];
                 document.querySelectorAll(".row-dienbien").forEach(row => {
@@ -687,7 +813,7 @@
             db.ref(path).get().then((snapshot) => {
                 if (snapshot.exists()) {
                     let data = snapshot.val();
-                    duLieuTamThoi = Object.values(data);
+                    duLieuTamThoi = Object.values(data).filter(item => item && item.id);
                     let h = "";
                     duLieuTamThoi.reverse().forEach(ba => {
                         h += `
@@ -770,7 +896,6 @@
                     }
                 }
 
-                // Tải lại toàn bộ hình ảnh
                 document.getElementById("danh-sach-anh" + s).innerHTML = "";
                 if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
                     ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
@@ -787,20 +912,17 @@
         function batDauTrinhChieu() {
             if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU DỮ LIỆU LÊN HỆ THỐNG!"); return; }
 
-            // 1. Set text chung cho màn Welcome và Presenter Box
             let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
             document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa" + s).value.toUpperCase();
             document.getElementById("out-welcome-title").innerText = loaiFormHienTai === 'BA' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨" : "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH ĐƠN THUỐC ✨";
             document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay" + s).value;
 
-            // Xóa tất cả đánh dấu slide hiển thị
             document.querySelectorAll('.slide').forEach(e => {
                 e.classList.remove('slide-active-target');
-                e.style.display = 'none'; // Giấu hết toàn bộ
+                e.style.display = 'none';
             });
             document.querySelector('.slide-welcome').classList.add('slide-active-target');
 
-            // 2. Lắp ráp dữ liệu tùy theo Loại
             if(loaiFormHienTai === 'BA') {
                 document.getElementById("out-ten-benh-ba").innerText = document.getElementById("in-ten-benh-ba").value;
                 document.getElementById("out-ten-ba").innerText = document.getElementById("in-ten-ba").value;
@@ -826,18 +948,15 @@
                 htmlBang += `</table>`;
                 document.getElementById("out-bang-dienbien-ba").innerHTML = htmlBang;
 
-                // Kích hoạt các slide của BA
                 document.querySelectorAll('.slide-ba').forEach(e => e.classList.add('slide-active-target'));
             } else {
                 document.getElementById("out-ten-benh-dt").innerText = document.getElementById("in-ten-benh-dt").value;
                 document.getElementById("out-khoa-dt-slide").innerText = document.getElementById("in-khoa-dt").value;
                 document.getElementById("out-nguoi-tb-dt-slide").innerText = document.getElementById("in-nguoi-trinh-bay-dt").value;
 
-                // Kích hoạt các slide của Đơn Thuốc
                 document.querySelectorAll('.slide-dt').forEach(e => e.classList.add('slide-active-target'));
             }
 
-            // 3. Đổ hình ảnh vào slide
             document.querySelectorAll('.slide-anh-dong').forEach(e => e.remove());
             let container = document.getElementById("slide-container");
             let anhRows = document.querySelectorAll('#danh-sach-anh' + s + ' .row-anh');
@@ -868,12 +987,10 @@
                 }
             }
 
-            // Mở màn hình chiếu
             document.querySelector(".khu-vuc-nhap[style*='display: block']").style.display = "none";
             document.getElementById("khu-vuc-trinh-chieu").style.display = "block";
             let elem = document.documentElement; if (elem.requestFullscreen) elem.requestFullscreen();
 
-            // Chỉ lọc và chiếu những Slide đã được Tag 'slide-active-target'
             danhSachSlide = document.querySelectorAll(".slide-active-target"); 
             slideHienTai = 0;
             hienThiSlide(slideHienTai);
@@ -888,11 +1005,11 @@
         function hienThiSlide(n) {
             for (let i = 0; i < danhSachSlide.length; i++) {
                 danhSachSlide[i].classList.remove("active");
-                danhSachSlide[i].style.display = 'none'; // Giấu đi
+                danhSachSlide[i].style.display = 'none';
             }
             if(danhSachSlide[n]) {
                 danhSachSlide[n].classList.add("active"); 
-                danhSachSlide[n].style.display = 'block'; // Chỉ hiện cái active
+                danhSachSlide[n].style.display = 'block';
             }
         }
 
@@ -925,13 +1042,11 @@
         function docFileXMLHoso(event) {
             let file = event.target.files[0];
             if (!file) return;
-
             let reader = new FileReader();
             reader.onload = function(e) {
                 let text = e.target.result;
                 let parser = new DOMParser();
                 let xmlDoc = parser.parseFromString(text, "text/xml");
-                
                 let filesHoso = xmlDoc.getElementsByTagName("FILEHOSO");
                 let base64Data = "";
                 for (let i = 0; i < filesHoso.length; i++) {
@@ -941,40 +1056,31 @@
                         break;
                     }
                 }
-
                 if (!base64Data) { alert("❌ Không tìm thấy dữ liệu XML1 trong file này!"); return; }
-
                 try {
                     let decodedStr = decodeURIComponent(escape(window.atob(base64Data)));
                     let xmlDacTa = parser.parseFromString(decodedStr, "text/xml");
-
                     let hoTen = xmlDacTa.getElementsByTagName("HO_TEN")[0]?.textContent || "";
                     let ngaySinhStr = xmlDacTa.getElementsByTagName("NGAY_SINH")[0]?.textContent || ""; 
                     let diaChi = xmlDacTa.getElementsByTagName("DIA_CHI")[0]?.textContent || "";
                     let tenBenh = xmlDacTa.getElementsByTagName("TEN_BENH")[0]?.textContent || "";
                     let lyDoVaoVien = xmlDacTa.getElementsByTagName("LY_DO_VV")[0]?.textContent || "";
-
                     let tuoi = "";
                     if (ngaySinhStr.length >= 4) {
                         let namSinh = parseInt(ngaySinhStr.substring(0, 4));
                         let namHienTai = new Date().getFullYear();
                         tuoi = (namHienTai - namSinh).toString();
                     }
-
                     let tenBenhChuan = tenBenh.split(';')[0]; 
-
-                    // Đổ dữ liệu vào Form Bệnh Án
                     document.getElementById("in-ten-ba").value = hoTen;
                     document.getElementById("in-tuoi-ba").value = tuoi;
                     document.getElementById("in-diachi-ba").value = diaChi;
                     document.getElementById("in-ten-benh-ba").value = tenBenhChuan;
                     document.getElementById("in-chandoan-ba").value = tenBenh;
                     document.getElementById("in-lydo-ba").value = lyDoVaoVien; 
-                    
                     capNhatTieuDeBenh();
                     alert("✅ Đã tải thành công hồ sơ bệnh nhân: " + hoTen);
                 } catch (error) {
-                    console.error("Lỗi parse dữ liệu:", error);
                     alert("❌ Có lỗi xảy ra khi giải mã file XML này!");
                 }
                 event.target.value = ''; 
@@ -985,7 +1091,7 @@
         function xuatFileDuLieu() {
             let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
             let tenBenh = document.getElementById("in-ten-benh" + s).value.trim();
-            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); document.getElementById("in-ten-benh" + s).focus(); return; }
+            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); return; }
 
             let arrAnh = [];
             document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
@@ -1022,18 +1128,14 @@
             }
 
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(duLieu, null, 2));
-            let downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            let prefix = loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : 'Backup_DonThuoc_';
-            let nameFile = tenBenh.replace(/\s/g, "_");
-            downloadAnchorNode.setAttribute("download", prefix + nameFile + ".json");
-            document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove();
+            let dlNode = document.createElement('a'); dlNode.setAttribute("href", dataStr);
+            dlNode.setAttribute("download", (loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : 'Backup_DonThuoc_') + tenBenh.replace(/\s/g, "_") + ".json");
+            document.body.appendChild(dlNode); dlNode.click(); dlNode.remove();
         }
 
         function nhapFileDuLieu(event) {
             let file = event.target.files[0];
             if (!file) return;
-
             let reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -1041,8 +1143,7 @@
                     let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
                     
                     if(ba.loaiForm && ba.loaiForm !== loaiFormHienTai) {
-                        alert(`❌ File này là của ${ba.loaiForm === 'BA' ? 'Bệnh án' : 'Đơn thuốc'}, bạn đang ở mục khác!`);
-                        return;
+                        alert(`❌ File này là của ${ba.loaiForm === 'BA' ? 'Bệnh án' : 'Đơn thuốc'}, bạn đang ở mục khác!`); return;
                     }
 
                     document.getElementById("in-khoa" + s).value = ba.khoa || "";
@@ -1082,12 +1183,143 @@
                     capNhatTieuDeBenh();
                     alert("✅ Đã khôi phục dữ liệu từ file sao lưu thành công!");
                 } catch (error) {
-                    console.error("Lỗi parse JSON:", error);
                     alert("❌ File không đúng định dạng sao lưu (.json)!");
                 }
                 event.target.value = ''; 
             };
             reader.readAsText(file);
+        }
+
+        // ==========================================
+        // MODULE: XUẤT FILE PDF AN TOÀN - CHỮ SẮC NÉT
+        // ==========================================
+        function getTodayStr() {
+            let d = new Date(); let m = '' + (d.getMonth() + 1), day = '' + d.getDate(), y = d.getFullYear();
+            if (m.length < 2) m = '0' + m; if (day.length < 2) day = '0' + day; return [y, m, day].join('-');
+        }
+
+        function removeAccents(str) {
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/\s+/g, '_');
+        }
+
+        function xuatPDFBenhAn() {
+            let tenBenh = document.getElementById("in-ten-benh-ba").value.trim();
+            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh / Chẩn đoán để kết xuất PDF!"); return; }
+
+            // Đổ dữ liệu từ Form nhập liệu sang File mẫu A4 ẩn
+            document.getElementById("pdf-ba-khoa").innerText = document.getElementById("in-khoa-ba").value;
+            document.getElementById("pdf-ba-ma").innerText = maHoSoHienTai || 'BA-' + new Date().getTime().toString().slice(-6);
+            document.getElementById("pdf-ba-ten").innerText = document.getElementById("in-ten-ba").value || "..................";
+            document.getElementById("pdf-ba-tuoi").innerText = document.getElementById("in-tuoi-ba").value || "...";
+            document.getElementById("pdf-ba-nghe").innerText = document.getElementById("in-nghe-ba").value || "...";
+            document.getElementById("pdf-ba-diachi").innerText = document.getElementById("in-diachi-ba").value || "...";
+            document.getElementById("pdf-ba-lydo").innerText = document.getElementById("in-lydo-ba").value;
+            document.getElementById("pdf-ba-benhsu").innerText = document.getElementById("in-benhsu-ba").value;
+            document.getElementById("pdf-ba-tiensu").innerText = document.getElementById("in-tiensu-ba").value;
+            document.getElementById("pdf-ba-kham").innerText = document.getElementById("in-khamchung-ba").value;
+            document.getElementById("pdf-ba-cls").innerText = document.getElementById("in-cls-text-ba").value;
+            document.getElementById("pdf-ba-tomtat").innerText = document.getElementById("in-tomtat-ba").value;
+            document.getElementById("pdf-ba-chandoan").innerText = document.getElementById("in-chandoan-ba").value || tenBenh;
+            document.getElementById("pdf-ba-banluan").innerText = document.getElementById("in-banluan-ba").value;
+            document.getElementById("pdf-ba-bacsiky").innerText = document.getElementById("in-nguoi-trinh-bay-ba").value;
+
+            // Xử lý nạp bảng diễn biến xử trí vào mẫu in
+            let tbodyDienBien = document.getElementById("pdf-ba-dienbien-tbody");
+            tbodyDienBien.innerHTML = ''; let hasDienBien = false;
+            document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
+                let tg = row.querySelector('.db-thoigian').value;
+                let db = row.querySelector('.db-dienbien').value;
+                let xt = row.querySelector('.db-xutri').value;
+                if(tg || db || xt) {
+                    hasDienBien = true;
+                    tbodyDienBien.innerHTML += `<tr class="avoid-break"><td>${tg}</td><td>${db.replace(/\n/g, '<br>')}</td><td>${xt.replace(/\n/g, '<br>')}</td></tr>`;
+                }
+            });
+            document.getElementById('pdf-ba-dienbien-container').style.display = hasDienBien ? 'block' : 'none';
+
+            // Xử lý nạp ảnh cận lâm sàng đã dán
+            let imgContainer = document.getElementById("pdf-ba-images"); imgContainer.innerHTML = "";
+            document.querySelectorAll('#danh-sach-anh-ba .row-anh').forEach(row => {
+                let b64 = row.querySelector('.base64-data').value; let ghiChu = row.querySelector('.txt-ghichu').value;
+                if (b64) {
+                    imgContainer.innerHTML += `<div style="page-break-inside:avoid; margin-top:15px; text-align:center;"><img src="${b64}" style="max-width:95%; max-height:480px; border:1px solid #333; padding:2px;"><br><i style="color:#dc2626; font-size:14px; font-weight:bold; margin-top:5px; display:block;">Hình ảnh đính kèm: ${ghiChu}</i></div>`;
+                }
+            });
+
+            thucHienExportPDF('pdf-template-ba', `BenhAn_${removeAccents(document.getElementById("in-ten-ba").value || "BenhNhan")}_${getTodayStr()}.pdf`);
+        }
+
+        function xuatPDFDonThuoc() {
+            let tenBenh = document.getElementById("in-ten-benh-dt").value.trim();
+            if(!tenBenh) { alert("Vui lòng nhập thông tin Đơn thuốc để kết xuất PDF!"); return; }
+
+            document.getElementById("pdf-dt-khoa").innerText = document.getElementById("in-khoa-dt").value;
+            document.getElementById("pdf-dt-ma").innerText = maHoSoHienTai || 'DT-' + new Date().getTime().toString().slice(-6);
+            document.getElementById("pdf-dt-chandoan").innerText = tenBenh;
+            document.getElementById("pdf-dt-bacsiky").innerText = document.getElementById("in-nguoi-trinh-bay-dt").value;
+
+            // Xử lý nạp ảnh đơn thuốc đã dán vào mẫu in
+            let imgContainer = document.getElementById("pdf-dt-images"); imgContainer.innerHTML = ""; let hasImage = false;
+            document.querySelectorAll('#danh-sach-anh-dt .row-anh').forEach(row => {
+                let b64 = row.querySelector('.base64-data').value; let ghiChu = row.querySelector('.txt-ghichu').value;
+                if (b64) {
+                    hasImage = true;
+                    imgContainer.innerHTML += `<div style="page-break-inside:avoid; margin-top:15px; text-align:center;"><img src="${b64}" style="max-width:95%; border:1px dashed #0284c7; padding:4px;"><br><i style="color:#dc2626; font-size:14px; font-weight:bold; margin-top:5px; display:block;">Ghi chú đơn thuốc: ${ghiChu}</i></div>`;
+                }
+            });
+            
+            if(!hasImage) { 
+                if(!confirm("Đơn thuốc chưa có hình ảnh nào. Vẫn tiếp tục xuất PDF rỗng?")) return; 
+            }
+
+            thucHienExportPDF('pdf-template-dt', `DonThuoc_${removeAccents(tenBenh.substring(0,20))}_${getTodayStr()}.pdf`);
+        }
+
+        // HÀM LÀM MỊN GIAO DIỆN VÀ XOÁ LỖI TRẮNG FILE TRÊN CLIENT
+        function thucHienExportPDF(templateId, fileName) {
+            // Bước 1: Hiện màng bảo vệ Loader
+            document.getElementById("pdf-loader").style.display = "flex"; 
+            
+            let container = document.getElementById("pdf-export-container");
+            let template = document.getElementById(templateId);
+
+            // QUAN TRỌNG NHẤT: Ép trình duyệt cuộn lên đỉnh trang để chống lỗi lệch tọa độ chụp của thẻ Canvas
+            window.scrollTo(0, 0);
+
+            // Kéo khung in ra để trình duyệt render
+            container.style.display = "block"; 
+            document.getElementById('pdf-template-ba').style.display = (templateId === 'pdf-template-ba') ? 'block' : 'none';
+            document.getElementById('pdf-template-dt').style.display = (templateId === 'pdf-template-dt') ? 'block' : 'none';
+
+            let opt = {
+                margin:       [15, 15, 15, 15], // Căn lề trên, trái, dưới, phải (mm)
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    letterRendering: true, 
+                    scrollY: 0, // Bắt buộc chụp từ tọa độ Y=0
+                    windowY: 0,
+                    backgroundColor: '#ffffff' // Phủ nền trắng tinh để không bị lỗi xuyên thấu
+                }, 
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Bước 3: Đợi 800ms để DOM vẽ xong dữ liệu rồi mới "Chụp" thành PDF
+            setTimeout(() => {
+                // Nhắm thẳng vào ID của Template con thay vì Container mẹ
+                html2pdf().set(opt).from(template).save().then(() => {
+                    // Trả lại hiện trạng cũ sau khi xuất thành công
+                    container.style.display = "none";
+                    document.getElementById("pdf-loader").style.display = "none";
+                }).catch(err => {
+                    console.error("Lỗi xuất PDF:", err);
+                    alert("❌ Đã có lỗi xảy ra trong quá trình kết xuất PDF!");
+                    container.style.display = "none";
+                    document.getElementById("pdf-loader").style.display = "none";
+                });
+            }, 800); 
         }
     </script>
 </body>
