@@ -558,6 +558,54 @@ const firebaseConfig = {
         khuTrinhChieuKeoAnh.addEventListener("pointercancel", ketThucKeoAnh);
         khuTrinhChieuKeoAnh.addEventListener("pointerleave", ketThucKeoAnh);
 
+
+        // Lăn chuột để phóng to / thu nhỏ hình ảnh khi trình chiếu
+        // Bản sửa: bắt sự kiện wheel trên toàn màn hình trình chiếu,
+        // không phụ thuộc con trỏ có nằm đúng vào thẻ .slide-image-container hay không.
+        function xuLyLanChuotThuPhongAnh(e) {
+            const khuTrinhChieu = document.getElementById("khu-vuc-trinh-chieu");
+            if(!khuTrinhChieu || khuTrinhChieu.style.display !== "block") return;
+            if(!dangChieuSlideHinhAnh()) return;
+            if(e.target.closest && e.target.closest('.slide-controls')) return;
+
+            const slideDangChieu = danhSachSlide && danhSachSlide[slideHienTai];
+            const khungAnh = slideDangChieu ? slideDangChieu.querySelector('.slide-image-container') : null;
+            if(!khungAnh) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const mucCu = mucThuPhongAnh;
+            const heSoZoom = e.deltaY < 0 ? 1.12 : 0.88;
+
+            mucThuPhongAnh = Math.min(
+                mucThuPhongAnhMax,
+                Math.max(mucThuPhongAnhMin, +(mucThuPhongAnh * heSoZoom).toFixed(2))
+            );
+
+            const mucMoi = mucThuPhongAnh;
+            if(mucMoi === mucCu) {
+                capNhatThuPhongAnh();
+                return;
+            }
+
+            // Giữ vị trí con trỏ chuột làm tâm thu/phóng
+            const rect = khungAnh.getBoundingClientRect();
+            const tamX = rect.left + rect.width / 2;
+            const tamY = rect.top + rect.height / 2;
+
+            const chuotX = e.clientX - tamX;
+            const chuotY = e.clientY - tamY;
+
+            viTriAnhX = chuotX - ((chuotX - viTriAnhX) / mucCu) * mucMoi;
+            viTriAnhY = chuotY - ((chuotY - viTriAnhY) / mucCu) * mucMoi;
+
+            capNhatThuPhongAnh();
+        }
+
+        // Dùng capture + passive:false để Chrome cho chặn cuộn mặc định khi đang trình chiếu
+        window.addEventListener("wheel", xuLyLanChuotThuPhongAnh, { passive: false, capture: true });
+
         function chuyenSlide(buoc) {
             if (slideHienTai + buoc >= 0 && slideHienTai + buoc < danhSachSlide.length) {
                 slideHienTai += buoc;
