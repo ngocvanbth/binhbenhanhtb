@@ -122,9 +122,16 @@
         table.tb-dienbien td:nth-child(2) { width: 45%; text-align: left; } 
         table.tb-dienbien td:nth-child(3) { width: 40%; text-align: left; } 
 
-        .slide-image-container { text-align: center; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; }
-        .slide-image-container img { max-height: 100%; max-width: 95%; border: 4px solid var(--primary-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); object-fit: contain; }
+        .slide-image-container { text-align: center; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 72vh; overflow: hidden; cursor: grab; touch-action: none; }
+        .slide-image-container.dragging { cursor: grabbing; }
+        .slide-image-container img { max-height: 100%; max-width: 98%; border: 4px solid var(--primary-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); object-fit: contain; transform: translate(var(--image-pan-x, 0px), var(--image-pan-y, 0px)) scale(var(--image-zoom, 1)); transform-origin: center center; transition: transform 0.12s ease-in-out; user-select: none; pointer-events: none; }
+        .slide-image-container.dragging img { transition: none; }
+        .slide-content.image-slide-content { max-height: none; overflow: visible; padding-left: 0; padding-right: 0; height: calc(100vh - 175px) !important; }
         .slide-image-note { margin-top: 15px; font-size: 34px; color: #dc2626; font-style: italic; font-weight: 900; }
+        .zoom-controls { display: none; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.92); border: 2px solid #cbd5e1; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .zoom-controls.show { display: flex; }
+        .slide-controls button.zoom-btn { padding: 10px 16px; min-width: 56px; font-size: 20px; }
+        .zoom-percent { min-width: 58px; text-align: center; font-size: 18px; font-weight: 900; color: var(--primary-color); user-select: none; }
 
         /* =========================================
            6. CSS RIÊNG CHO SLIDE CHÀO MỪNG
@@ -465,6 +472,16 @@
         </div>
 
         <div class="slide-controls">
+            <div id="zoom-controls" class="zoom-controls" title="Chỉ hiện khi đang ở slide có hình ảnh">
+                <button class="zoom-btn" onclick="thuPhongAnh(-0.1)" title="Thu nhỏ hình ảnh">🔍−</button>
+                <span id="zoom-percent" class="zoom-percent">100%</span>
+                <button class="zoom-btn" onclick="thuPhongAnh(0.1)" title="Phóng to hình ảnh">🔍+</button>
+                <button class="zoom-btn" onclick="diChuyenAnh(0, -40)" title="Di chuyển ảnh lên">↑</button>
+                <button class="zoom-btn" onclick="diChuyenAnh(0, 40)" title="Di chuyển ảnh xuống">↓</button>
+                <button class="zoom-btn" onclick="diChuyenAnh(-40, 0)" title="Di chuyển ảnh sang trái">←</button>
+                <button class="zoom-btn" onclick="diChuyenAnh(40, 0)" title="Di chuyển ảnh sang phải">→</button>
+                <button class="zoom-btn" onclick="datLaiThuPhongAnh()" title="Đưa hình ảnh về 100%">100%</button>
+            </div>
             <button onclick="chuyenSlide(-1)">Quay lại</button>
             <button onclick="chuyenSlide(1)">Tiếp theo</button>
             <button onclick="ketThucTrinhChieu()" style="background-color: #ef4444; color: white;">Thoát</button>
@@ -971,7 +988,7 @@
                     let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
                     newSlide.innerHTML = `
                         <div class="slide-header">${titleStr}</div>
-                        <div class="slide-content" style="height: 100%; display: flex; flex-direction: column;">
+                        <div class="slide-content image-slide-content" style="display: flex; flex-direction: column;">
                             <div class="slide-image-container">
                                 <img src="${base64}">
                                 ${ghiChu ? `<div class="slide-image-note">${ghiChu}</div>` : ''}
@@ -993,6 +1010,7 @@
 
             danhSachSlide = document.querySelectorAll(".slide-active-target"); 
             slideHienTai = 0;
+            datLaiThuPhongAnh(false);
             hienThiSlide(slideHienTai);
         }
 
@@ -1011,29 +1029,162 @@
                 danhSachSlide[n].classList.add("active"); 
                 danhSachSlide[n].style.display = 'block';
             }
+            capNhatHienThiNutThuPhong();
         }
+
+        let mucThuPhongAnh = 1;
+        let viTriAnhX = 0;
+        let viTriAnhY = 0;
+
+        const mucThuPhongAnhMin = 0.7;
+        const mucThuPhongAnhMax = 2.8;
+
+        function dangChieuSlideHinhAnh() {
+            const slideDangChieu = danhSachSlide && danhSachSlide[slideHienTai];
+            return !!(slideDangChieu && slideDangChieu.querySelector('.slide-image-container img'));
+        }
+
+        function capNhatThuPhongAnh() {
+            const khuTrinhChieu = document.getElementById("khu-vuc-trinh-chieu");
+
+            if(khuTrinhChieu) {
+                khuTrinhChieu.style.setProperty('--image-zoom', mucThuPhongAnh);
+                khuTrinhChieu.style.setProperty('--image-pan-x', viTriAnhX + "px");
+                khuTrinhChieu.style.setProperty('--image-pan-y', viTriAnhY + "px");
+            }
+
+            const zoomPercent = document.getElementById("zoom-percent");
+            if(zoomPercent) zoomPercent.innerText = Math.round(mucThuPhongAnh * 100) + "%";
+        }
+
+        function thuPhongAnh(buoc) {
+            if(!dangChieuSlideHinhAnh()) return;
+            mucThuPhongAnh = Math.min(mucThuPhongAnhMax, Math.max(mucThuPhongAnhMin, +(mucThuPhongAnh + buoc).toFixed(2)));
+            capNhatThuPhongAnh();
+        }
+
+        function diChuyenAnh(x, y) {
+            if(!dangChieuSlideHinhAnh()) return;
+            viTriAnhX += x;
+            viTriAnhY += y;
+            capNhatThuPhongAnh();
+        }
+
+        function datLaiThuPhongAnh(thongBao = true) {
+            mucThuPhongAnh = 1;
+            viTriAnhX = 0;
+            viTriAnhY = 0;
+            capNhatThuPhongAnh();
+            if(thongBao) capNhatHienThiNutThuPhong();
+        }
+
+        function capNhatHienThiNutThuPhong() {
+            const zoomControls = document.getElementById("zoom-controls");
+            const coHinhAnh = dangChieuSlideHinhAnh();
+            if(zoomControls) zoomControls.classList.toggle('show', coHinhAnh);
+        }
+
+        let dangKeoAnh = false;
+        let diemBatDauX = 0;
+        let diemBatDauY = 0;
+        let viTriBatDauX = 0;
+        let viTriBatDauY = 0;
+        let boQuaClickTrinhChieu = false;
+        let khungAnhDangKeo = null;
+
+        const khuTrinhChieuKeoAnh = document.getElementById("khu-vuc-trinh-chieu");
+
+        khuTrinhChieuKeoAnh.addEventListener("pointerdown", function(e) {
+            const khungAnh = e.target.closest('.slide-image-container');
+            if(!khungAnh || !dangChieuSlideHinhAnh()) return;
+            if(e.pointerType === "mouse" && e.button !== 0) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            dangKeoAnh = true;
+            boQuaClickTrinhChieu = true;
+            khungAnhDangKeo = khungAnh;
+
+            diemBatDauX = e.clientX;
+            diemBatDauY = e.clientY;
+            viTriBatDauX = viTriAnhX;
+            viTriBatDauY = viTriAnhY;
+
+            khungAnh.classList.add("dragging");
+            khungAnh.setPointerCapture?.(e.pointerId);
+        });
+
+        khuTrinhChieuKeoAnh.addEventListener("pointermove", function(e) {
+            if(!dangKeoAnh) return;
+
+            e.preventDefault();
+
+            viTriAnhX = viTriBatDauX + (e.clientX - diemBatDauX);
+            viTriAnhY = viTriBatDauY + (e.clientY - diemBatDauY);
+
+            capNhatThuPhongAnh();
+        });
+
+        function ketThucKeoAnh() {
+            if(!dangKeoAnh) return;
+
+            dangKeoAnh = false;
+
+            if(khungAnhDangKeo) {
+                khungAnhDangKeo.classList.remove("dragging");
+                khungAnhDangKeo = null;
+            }
+        }
+
+        khuTrinhChieuKeoAnh.addEventListener("pointerup", ketThucKeoAnh);
+        khuTrinhChieuKeoAnh.addEventListener("pointercancel", ketThucKeoAnh);
+        khuTrinhChieuKeoAnh.addEventListener("pointerleave", ketThucKeoAnh);
 
         function chuyenSlide(buoc) {
             if (slideHienTai + buoc >= 0 && slideHienTai + buoc < danhSachSlide.length) {
                 slideHienTai += buoc;
+                datLaiThuPhongAnh(false);
                 hienThiSlide(slideHienTai);
             }
         }
 
         document.addEventListener('keydown', function(event) {
             if (document.getElementById("khu-vuc-trinh-chieu").style.display === "block") {
-                if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " " || event.key === "Enter") {
+                if ((event.key === "ArrowUp" || event.key === "ArrowDown" || event.key === "ArrowLeft" || event.key === "ArrowRight") && dangChieuSlideHinhAnh() && event.shiftKey) {
+                    event.preventDefault();
+                    if(event.key === "ArrowUp") diChuyenAnh(0, -40);
+                    if(event.key === "ArrowDown") diChuyenAnh(0, 40);
+                    if(event.key === "ArrowLeft") diChuyenAnh(-40, 0);
+                    if(event.key === "ArrowRight") diChuyenAnh(40, 0);
+                } else if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " " || event.key === "Enter") {
                     event.preventDefault(); chuyenSlide(1);
                 } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
                     event.preventDefault(); chuyenSlide(-1);
+                } else if (event.key === "+" || event.key === "=") {
+                    event.preventDefault(); thuPhongAnh(0.1);
+                } else if (event.key === "-" || event.key === "_") {
+                    event.preventDefault(); thuPhongAnh(-0.1);
+                } else if (event.key === "0") {
+                    event.preventDefault(); datLaiThuPhongAnh();
                 } else if (event.key === "Escape") { ketThucTrinhChieu(); }
             }
         });
 
         document.getElementById("khu-vuc-trinh-chieu").addEventListener("click", function(e) {
-            if(e.target.tagName === 'BUTTON') return;
-            let clickX = e.clientX; let screenWidth = window.innerWidth;
-            if(clickX > screenWidth / 2) chuyenSlide(1); else chuyenSlide(-1);
+            if(boQuaClickTrinhChieu) {
+                boQuaClickTrinhChieu = false;
+                return;
+            }
+
+            if(e.target.closest('.slide-controls')) return;
+            if(e.target.closest('.slide-image-container')) return;
+
+            let clickX = e.clientX;
+            let screenWidth = window.innerWidth;
+
+            if(clickX > screenWidth / 2) chuyenSlide(1);
+            else chuyenSlide(-1);
         });
 
         // ==========================================
