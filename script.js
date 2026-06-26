@@ -19,6 +19,32 @@ const firebaseConfig = {
         let maHoSoHienTai = "";
         let duLieuTamThoi = []; 
 
+        const cauHinhLoaiForm = {
+            BA: { suffix: '-ba', formId: 'khu-vuc-nhap-lieu-ba', path: 'DanhSachBenhAn', maPrefix: 'BA-', inputTen: 'in-ten-benh-ba', inputMatKhau: 'in-mat-khau-ba', inputNguoi: 'in-nguoi-trinh-bay-ba', inputKhoa: 'in-khoa-ba', hienThi: 'hien-thi-ten-benh-ba', prefixHienThi: 'TÊN BỆNH: ', tenChucNang: 'Bệnh án', titleTimKiem: '🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU' },
+            DT: { suffix: '-dt', formId: 'khu-vuc-nhap-lieu-dt', path: 'DanhSachDonThuoc', maPrefix: 'DT-', inputTen: 'in-ten-benh-dt', inputMatKhau: 'in-mat-khau-dt', inputNguoi: 'in-nguoi-trinh-bay-dt', inputKhoa: 'in-khoa-dt', hienThi: 'hien-thi-ten-benh-dt', prefixHienThi: 'THÔNG TIN ĐƠN THUỐC: ', tenChucNang: 'Đơn thuốc', titleTimKiem: '🔍 QUẢN LÝ ĐƠN THUỐC ĐÃ LƯU' },
+            LT: { suffix: '-lt', formId: 'khu-vuc-nhap-lieu-lt', path: 'DanhSachLyThuyet', maPrefix: 'LT-', inputTen: 'in-ten-benh-lt', inputMatKhau: 'in-mat-khau-lt', inputNguoi: 'in-nguoi-trinh-bay-lt', inputKhoa: 'in-khoa-lt', hienThi: 'hien-thi-ten-benh-lt', prefixHienThi: 'CHỦ ĐỀ LÝ THUYẾT: ', tenChucNang: 'Lý thuyết', titleTimKiem: '🔍 QUẢN LÝ PHẦN LÝ THUYẾT ĐÃ LƯU' }
+        };
+
+        const mucLyThuyetCoSan = [
+            { key: 'mucTieu', id: 'in-lt-muctieu', tieuDe: '🎯 I. MỤC TIÊU BÀI HỌC' },
+            { key: 'daiCuong', id: 'in-lt-daiduong', tieuDe: '📌 II. ĐẠI CƯƠNG / KHÁI NIỆM' },
+            { key: 'nguyenNhan', id: 'in-lt-nguyennhan', tieuDe: '🧬 III. NGUYÊN NHÂN / CƠ CHẾ / YẾU TỐ NGUY CƠ' },
+            { key: 'lamSang', id: 'in-lt-lamsang', tieuDe: '🩺 IV. TRIỆU CHỨNG LÂM SÀNG' },
+            { key: 'canLamSang', id: 'in-lt-canlamsang', tieuDe: '🔬 V. CẬN LÂM SÀNG / CHẨN ĐOÁN' },
+            { key: 'dieuTri', id: 'in-lt-dieutri', tieuDe: '💊 VI. ĐIỀU TRỊ / CHĂM SÓC / THEO DÕI' },
+            { key: 'phongBenh', id: 'in-lt-phongbenh', tieuDe: '🛡️ VII. PHÒNG BỆNH / GIÁO DỤC SỨC KHỎE' },
+            { key: 'banLuan', id: 'in-lt-banluan', tieuDe: '💡 VIII. GHI NHỚ / CÂU HỎI THẢO LUẬN' }
+        ];
+
+        function layCauHinhLoai(loai = loaiFormHienTai) { return cauHinhLoaiForm[loai] || cauHinhLoaiForm.BA; }
+        function layGiaTri(id) { return (document.getElementById(id)?.value || '').trim(); }
+        function ganGiaTri(id, val) { const el = document.getElementById(id); if(el) el.value = val || ''; }
+        function escapeHtml(text) {
+            return String(text || '').replace(/[&<>"']/g, function(ch) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+            });
+        }
+
         // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP KHI MỞ/TẢI LẠI TRANG
         window.onload = function() {
             if(localStorage.getItem("daDangNhap") === "true") {
@@ -38,9 +64,15 @@ const firebaseConfig = {
             location.reload(); 
         }
 
+        function anTatCaFormNhapLieu() {
+            Object.values(cauHinhLoaiForm).forEach(cfg => {
+                const form = document.getElementById(cfg.formId);
+                if(form) form.style.display = "none";
+            });
+        }
+
         function quayLaiMenu() {
-            document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "none";
-            document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "none";
+            anTatCaFormNhapLieu();
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
         }
         
@@ -49,17 +81,13 @@ const firebaseConfig = {
             loaiFormHienTai = loai;
             maHoSoHienTai = ""; 
             trangThaiDaLuu = false;
-
-            if(loai === 'BA') {
-                document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "block";
-                document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "none";
-            } else {
-                document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "none";
-                document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "block";
-            }
+            anTatCaFormNhapLieu();
+            const cfg = layCauHinhLoai(loai);
+            document.getElementById(cfg.formId).style.display = "block";
+            capNhatTieuDeBenh();
         }
         
-        function xoaDong(btn) { btn.parentElement.parentElement.remove(); }
+        function xoaDong(btn) { btn.closest('.dynamic-row')?.remove(); }
 
         // ==========================================
         // CÔNG CỤ NÉN ẢNH CHỐNG NẶNG MÁY
@@ -161,11 +189,65 @@ const firebaseConfig = {
             document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
         }
 
+        function themDongMucLyThuyet(savedTieuDe = "", savedNoiDung = "") {
+            let div = document.createElement("div");
+            div.className = "dynamic-row row-lythuyet";
+            div.innerHTML = `
+                <div class="form-group" style="margin-bottom: 8px; width: 100%;">
+                    <label>Tiêu đề mục bổ sung:</label>
+                    <input type="text" class="lt-title-input" placeholder="Ví dụ: IX. Tình huống minh họa" value="${escapeHtml(savedTieuDe)}">
+                </div>
+                <div class="form-group" style="margin-bottom: 8px; width: 100%;">
+                    <label>Nội dung:</label>
+                    <textarea class="lt-content-input" rows="5" placeholder="Copy nội dung mục bổ sung vào đây...">${escapeHtml(savedNoiDung)}</textarea>
+                </div>
+                <button class="btn-delete-row" onclick="xoaDong(this)" style="width: 160px; align-self: flex-end;">Xóa mục này</button>
+            `;
+            document.getElementById("danh-sach-muc-lt").appendChild(div);
+        }
+
+        function thuThapDuLieuLyThuyet() {
+            let noiDungLyThuyet = {};
+            mucLyThuyetCoSan.forEach(muc => { noiDungLyThuyet[muc.key] = layGiaTri(muc.id); });
+            noiDungLyThuyet.mucBoSung = [];
+            document.querySelectorAll("#danh-sach-muc-lt .row-lythuyet").forEach(row => {
+                let tieuDe = row.querySelector('.lt-title-input')?.value.trim() || '';
+                let noiDung = row.querySelector('.lt-content-input')?.value.trim() || '';
+                if(tieuDe || noiDung) noiDungLyThuyet.mucBoSung.push({ tieuDe, noiDung });
+            });
+            return noiDungLyThuyet;
+        }
+
+        function napDuLieuLyThuyet(duLieu) {
+            mucLyThuyetCoSan.forEach(muc => { ganGiaTri(muc.id, duLieu?.noiDungLyThuyet?.[muc.key] || duLieu?.[muc.key] || ''); });
+            document.getElementById("danh-sach-muc-lt").innerHTML = "";
+            let dsBoSung = duLieu?.noiDungLyThuyet?.mucBoSung || duLieu?.mucBoSung || [];
+            dsBoSung.forEach(item => themDongMucLyThuyet(item.tieuDe || '', item.noiDung || ''));
+        }
+
+        function layDanhSachLyThuyetDeChieu() {
+            let ds = mucLyThuyetCoSan.map(muc => ({ tieuDe: muc.tieuDe, noiDung: layGiaTri(muc.id) }));
+            document.querySelectorAll("#danh-sach-muc-lt .row-lythuyet").forEach((row, idx) => {
+                let tieuDe = row.querySelector('.lt-title-input')?.value.trim() || `MỤC BỔ SUNG ${idx + 1}`;
+                let noiDung = row.querySelector('.lt-content-input')?.value.trim() || '';
+                if(tieuDe || noiDung) ds.push({ tieuDe, noiDung });
+            });
+            return ds.filter(item => item.noiDung && item.noiDung.trim());
+        }
+
+        function dinhDangNoiDungLyThuyet(noiDung) {
+            let dong = String(noiDung || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+            if(dong.length === 0) return '<p><i>Chưa nhập nội dung.</i></p>';
+            return dong.map(line => {
+                let clean = escapeHtml(line).replace(/^[-•+*]\s*/, '');
+                return `<p><span class="bullet-dot">•</span>${clean}</p>`;
+            }).join('');
+        }
+
         function capNhatTieuDeBenh() {
-            let val = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value;
-            let hienThiId = loaiFormHienTai === 'BA' ? "hien-thi-ten-benh-ba" : "hien-thi-ten-benh-dt";
-            let prefix = loaiFormHienTai === 'BA' ? "TÊN BỆNH: " : "THÔNG TIN ĐƠN THUỐC: ";
-            document.getElementById(hienThiId).innerText = val ? prefix + val.toUpperCase() : prefix + "..........................";
+            const cfg = layCauHinhLoai();
+            let val = document.getElementById(cfg.inputTen)?.value || '';
+            document.getElementById(cfg.hienThi).innerText = val ? cfg.prefixHienThi + val.toUpperCase() : cfg.prefixHienThi + "..........................";
             trangThaiDaLuu = false; 
         }
 
@@ -173,26 +255,28 @@ const firebaseConfig = {
         // LOGIC LƯU LÊN FIREBASE (BA & DT)
         // ==========================================
         function xuLyLuuHoSo() {
-            let tenBenh = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value.trim();
-            let matKhau = document.getElementById(loaiFormHienTai === 'BA' ? "in-mat-khau-ba" : "in-mat-khau-dt").value.trim();
-            let nguoiTrinhBay = document.getElementById(loaiFormHienTai === 'BA' ? "in-nguoi-trinh-bay-ba" : "in-nguoi-trinh-bay-dt").value.trim();
-            let khoa = document.getElementById(loaiFormHienTai === 'BA' ? "in-khoa-ba" : "in-khoa-dt").value;
+            const cfg = layCauHinhLoai();
+            let tenBenh = layGiaTri(cfg.inputTen);
+            let matKhau = layGiaTri(cfg.inputMatKhau);
+            let nguoiTrinhBay = layGiaTri(cfg.inputNguoi);
+            let khoa = document.getElementById(cfg.inputKhoa).value;
             
-            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh/Chẩn đoán!"); return; }
+            if(!tenBenh) { alert(loaiFormHienTai === 'LT' ? "Vui lòng nhập Chủ đề / Tên bài lý thuyết!" : "Vui lòng nhập Tên bệnh/Chẩn đoán!"); return; }
             if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm!"); return; }
 
             if(!maHoSoHienTai) {
-                let p = loaiFormHienTai === 'BA' ? 'BA-' : 'DT-';
-                maHoSoHienTai = p + new Date().getTime().toString().slice(-6);
+                maHoSoHienTai = cfg.maPrefix + new Date().getTime().toString().slice(-6);
             }
 
             let arrAnh = [];
-            let listAnhId = loaiFormHienTai === 'BA' ? '#danh-sach-anh-ba .row-anh' : '#danh-sach-anh-dt .row-anh';
-            document.querySelectorAll(listAnhId).forEach(row => {
-                let b64 = row.querySelector('.base64-data').value;
-                let note = row.querySelector('.txt-ghichu').value;
-                if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
-            });
+            if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                let listAnhId = '#danh-sach-anh' + cfg.suffix + ' .row-anh';
+                document.querySelectorAll(listAnhId).forEach(row => {
+                    let b64 = row.querySelector('.base64-data').value;
+                    let note = row.querySelector('.txt-ghichu').value;
+                    if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
+                });
+            }
 
             let duLieu = {
                 id: maHoSoHienTai, khoa: khoa, matKhau: matKhau, tenBenh: tenBenh,
@@ -202,7 +286,7 @@ const firebaseConfig = {
 
             if (loaiFormHienTai === 'BA') {
                 let arrDienBien = [];
-                document.querySelectorAll(".row-dienbien").forEach(row => {
+                document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
                     arrDienBien.push({
                         tg: row.querySelector('.db-thoigian').value,
                         db: row.querySelector('.db-dienbien').value,
@@ -225,8 +309,11 @@ const firebaseConfig = {
                 duLieu.dienBienList = arrDienBien;
             }
 
-            let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn/' : 'DanhSachDonThuoc/';
-            db.ref(path + maHoSoHienTai).set(duLieu)
+            if (loaiFormHienTai === 'LT') {
+                duLieu.noiDungLyThuyet = thuThapDuLieuLyThuyet();
+            }
+
+            db.ref(cfg.path + '/' + maHoSoHienTai).set(duLieu)
                 .then(() => {
                     document.getElementById("modal-ma-ba").innerText = maHoSoHienTai;
                     document.getElementById("modal-luu").style.display = "flex";
@@ -239,12 +326,12 @@ const firebaseConfig = {
         // TÌM KIẾM THEO CHUYÊN MỤC
         // ==========================================
         function moModalTimKiem() {
+            const cfg = layCauHinhLoai();
             document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center; color:#0284c7;'>⏳ Đang tải dữ liệu từ máy chủ...</p>";
-            document.getElementById("title-modal-tim-kiem").innerText = loaiFormHienTai === 'BA' ? "🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU" : "🔍 QUẢN LÝ ĐƠN THUỐC ĐÃ LƯU";
+            document.getElementById("title-modal-tim-kiem").innerText = cfg.titleTimKiem;
             document.getElementById("modal-tim-kiem").style.display = "flex";
 
-            let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn' : 'DanhSachDonThuoc';
-            db.ref(path).get().then((snapshot) => {
+            db.ref(cfg.path).get().then((snapshot) => {
                 if (snapshot.exists()) {
                     let data = snapshot.val();
                     duLieuTamThoi = Object.values(data).filter(item => item && item.id);
@@ -253,8 +340,8 @@ const firebaseConfig = {
                         h += `
                         <div class="search-item">
                             <div class="search-item-info" onclick="taiDuLieu('${ba.id}')">
-                                <strong>${ba.id}</strong> - ${ba.tenBenh} <br>
-                                <span style="font-size: 14px; color: #64748b;">${ba.khoa} | BS: ${ba.nguoiTrinhBay} | Lưu lúc: ${ba.ngayTao || ''}</span>
+                                <strong>${escapeHtml(ba.id)}</strong> - ${escapeHtml(ba.tenBenh || '')} <br>
+                                <span style="font-size: 14px; color: #64748b;">${escapeHtml(ba.khoa || '')} | Người trình bày: ${escapeHtml(ba.nguoiTrinhBay || '')} | Lưu lúc: ${escapeHtml(ba.ngayTao || '')}</span>
                             </div>
                             <button class="btn-delete-ba" onclick="xoaBenhAn('${ba.id}', event)">🗑️ Xóa</button>
                         </div>`;
@@ -270,19 +357,20 @@ const firebaseConfig = {
 
         function xoaBenhAn(id, event) {
             event.stopPropagation(); 
+            const cfg = layCauHinhLoai();
             let ba = duLieuTamThoi.find(x => x.id === id);
             if(!ba) return;
 
             if(ba.matKhau) {
-                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.\nVui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:`);
+                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.
+Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:`);
                 if(mkNhap === null) return; 
                 if(mkNhap !== ba.matKhau) { alert("❌ MẬT KHẨU KHÔNG ĐÚNG! Bạn không có quyền xóa hồ sơ này."); return; }
             }
 
             let xacNhan = confirm(`⚠️ Bạn có chắc chắn XÓA VĨNH VIỄN hồ sơ [${id}] khỏi hệ thống trực tuyến không?`);
             if(xacNhan) {
-                let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn/' : 'DanhSachDonThuoc/';
-                db.ref(path + id).remove()
+                db.ref(cfg.path + '/' + id).remove()
                     .then(() => {
                         alert("Đã xóa hồ sơ thành công!");
                         if(maHoSoHienTai === id) maHoSoHienTai = "";
@@ -298,13 +386,14 @@ const firebaseConfig = {
         function taiDuLieu(id) {
             let ba = duLieuTamThoi.find(x => x.id === id);
             if(ba) {
+                const cfg = layCauHinhLoai();
                 maHoSoHienTai = ba.id;
-                let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+                let s = cfg.suffix;
                 
-                document.getElementById("in-khoa" + s).value = ba.khoa;
+                document.getElementById("in-khoa" + s).value = ba.khoa || "";
                 document.getElementById("in-mat-khau" + s).value = ba.matKhau || "";
-                document.getElementById("in-ten-benh" + s).value = ba.tenBenh;
-                document.getElementById("in-nguoi-trinh-bay" + s).value = ba.nguoiTrinhBay;
+                document.getElementById("in-ten-benh" + s).value = ba.tenBenh || "";
+                document.getElementById("in-nguoi-trinh-bay" + s).value = ba.nguoiTrinhBay || "";
 
                 if(loaiFormHienTai === 'BA') {
                     document.getElementById("in-ten-ba").value = ba.tenBN || "";
@@ -321,18 +410,24 @@ const firebaseConfig = {
                     document.getElementById("in-banluan-ba").value = ba.banluan || "";
 
                     document.getElementById("danh-sach-dien-bien-ba").innerHTML = "";
-                    if(ba.dienBienList) {
+                    if(ba.dienBienList && ba.dienBienList.length > 0) {
                         ba.dienBienList.forEach(item => {
                             let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${escapeHtml(item.tg || '')}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${escapeHtml(item.db || '')}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${escapeHtml(item.xt || '')}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
                             document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
                         });
                     }
                 }
 
-                document.getElementById("danh-sach-anh" + s).innerHTML = "";
-                if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
-                    ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                if(loaiFormHienTai === 'LT') {
+                    napDuLieuLyThuyet(ba);
+                }
+
+                if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                    document.getElementById("danh-sach-anh" + s).innerHTML = "";
+                    if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
+                        ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                    }
                 }
 
                 capNhatTieuDeBenh(); trangThaiDaLuu = true; 
@@ -346,11 +441,13 @@ const firebaseConfig = {
         function batDauTrinhChieu() {
             if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU DỮ LIỆU LÊN HỆ THỐNG!"); return; }
 
-            let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
-            document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa" + s).value.toUpperCase();
-            document.getElementById("out-welcome-title").innerText = loaiFormHienTai === 'BA' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨" : "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH ĐƠN THUỐC ✨";
-            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay" + s).value;
+            const cfg = layCauHinhLoai();
+            let s = cfg.suffix;
+            document.getElementById("out-khoa-welcome").innerText = document.getElementById(cfg.inputKhoa).value.toUpperCase();
+            document.getElementById("out-welcome-title").innerText = loaiFormHienTai === 'BA' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨" : (loaiFormHienTai === 'DT' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH ĐƠN THUỐC ✨" : "✨ CHÀO MỪNG ĐẾN VỚI PHẦN LÝ THUYẾT ✨");
+            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById(cfg.inputNguoi).value;
 
+            document.querySelectorAll('.slide-anh-dong, .slide-lt-dong').forEach(e => e.remove());
             document.querySelectorAll('.slide').forEach(e => {
                 e.classList.remove('slide-active-target');
                 e.style.display = 'none';
@@ -373,50 +470,69 @@ const firebaseConfig = {
                 document.getElementById("out-banluan-ba").innerText = document.getElementById("in-banluan-ba").value;
 
                 let htmlBang = `<table class="tb-dienbien"><tr><th>THỜI GIAN</th><th>DIỄN BIẾN</th><th>XỬ TRÍ</th></tr>`;
-                document.querySelectorAll(".row-dienbien").forEach(row => {
-                    let tg = row.querySelector('.db-thoigian').value;
-                    let db = row.querySelector('.db-dienbien').value.replace(/\n/g, "<br>");
-                    let xt = row.querySelector('.db-xutri').value.replace(/\n/g, "<br>");
+                document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
+                    let tg = escapeHtml(row.querySelector('.db-thoigian').value);
+                    let db = escapeHtml(row.querySelector('.db-dienbien').value).replace(/\n/g, "<br>");
+                    let xt = escapeHtml(row.querySelector('.db-xutri').value).replace(/\n/g, "<br>");
                     if(tg || db || xt) htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
                 });
                 htmlBang += `</table>`;
                 document.getElementById("out-bang-dienbien-ba").innerHTML = htmlBang;
 
                 document.querySelectorAll('.slide-ba').forEach(e => e.classList.add('slide-active-target'));
-            } else {
+            } else if(loaiFormHienTai === 'DT') {
                 document.getElementById("out-ten-benh-dt").innerText = document.getElementById("in-ten-benh-dt").value;
                 document.getElementById("out-khoa-dt-slide").innerText = document.getElementById("in-khoa-dt").value;
                 document.getElementById("out-nguoi-tb-dt-slide").innerText = document.getElementById("in-nguoi-trinh-bay-dt").value;
 
                 document.querySelectorAll('.slide-dt').forEach(e => e.classList.add('slide-active-target'));
+            } else if(loaiFormHienTai === 'LT') {
+                let dsLyThuyet = layDanhSachLyThuyetDeChieu();
+                if(dsLyThuyet.length === 0) { alert("⚠️ Chưa có nội dung lý thuyết để trình chiếu. Vui lòng nhập ít nhất 1 mục nội dung."); return; }
+                document.getElementById("out-chu-de-lt").innerText = document.getElementById("in-ten-benh-lt").value;
+                document.getElementById("out-khoa-lt-slide").innerText = document.getElementById("in-khoa-lt").value;
+                document.getElementById("out-nguoi-tb-lt-slide").innerText = document.getElementById("in-nguoi-trinh-bay-lt").value;
+
+                const container = document.getElementById("slide-container");
+                dsLyThuyet.forEach(item => {
+                    let newSlide = document.createElement('div');
+                    newSlide.className = 'slide slide-lt-dong slide-active-target';
+                    newSlide.innerHTML = `
+                        <div class="slide-header">${escapeHtml(item.tieuDe)}</div>
+                        <div class="slide-content slide-theory-content">${dinhDangNoiDungLyThuyet(item.noiDung)}</div>
+                    `;
+                    container.appendChild(newSlide);
+                });
+                document.querySelectorAll('.slide-lt').forEach(e => e.classList.add('slide-active-target'));
             }
 
-            document.querySelectorAll('.slide-anh-dong').forEach(e => e.remove());
-            let container = document.getElementById("slide-container");
-            let anhRows = document.querySelectorAll('#danh-sach-anh' + s + ' .row-anh');
+            if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                let container = document.getElementById("slide-container");
+                let anhRows = document.querySelectorAll('#danh-sach-anh' + s + ' .row-anh');
 
-            for(let row of anhRows) {
-                let base64 = row.querySelector('.base64-data').value;
-                let ghiChu = row.querySelector('.txt-ghichu').value;
-                
-                if (base64) {
-                    let newSlide = document.createElement('div');
-                    newSlide.className = 'slide slide-anh-dong slide-active-target'; 
-                    let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
-                    newSlide.innerHTML = `
-                        <div class="slide-header">${titleStr}</div>
-                        <div class="slide-content image-slide-content" style="display: flex; flex-direction: column;">
-                            <div class="slide-image-container">
-                                <img src="${base64}">
-                                ${ghiChu ? `<div class="slide-image-note">${ghiChu}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
+                for(let row of anhRows) {
+                    let base64 = row.querySelector('.base64-data').value;
+                    let ghiChu = row.querySelector('.txt-ghichu').value;
                     
-                    if(loaiFormHienTai === 'BA') {
-                        container.insertBefore(newSlide, document.getElementById('slide-tomtat-ba'));
-                    } else {
-                        container.appendChild(newSlide);
+                    if (base64) {
+                        let newSlide = document.createElement('div');
+                        newSlide.className = 'slide slide-anh-dong slide-active-target'; 
+                        let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
+                        newSlide.innerHTML = `
+                            <div class="slide-header">${titleStr}</div>
+                            <div class="slide-content image-slide-content" style="display: flex; flex-direction: column;">
+                                <div class="slide-image-container">
+                                    <img src="${base64}">
+                                    ${ghiChu ? `<div class="slide-image-note">${escapeHtml(ghiChu)}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                        
+                        if(loaiFormHienTai === 'BA') {
+                            container.insertBefore(newSlide, document.getElementById('slide-tomtat-ba'));
+                        } else {
+                            container.appendChild(newSlide);
+                        }
                     }
                 }
             }
@@ -433,7 +549,7 @@ const firebaseConfig = {
 
         function ketThucTrinhChieu() {
             document.getElementById("khu-vuc-trinh-chieu").style.display = "none";
-            document.getElementById(loaiFormHienTai === 'BA' ? "khu-vuc-nhap-lieu-ba" : "khu-vuc-nhap-lieu-dt").style.display = "block";
+            document.getElementById(layCauHinhLoai().formId).style.display = "block";
             if (document.exitFullscreen) document.exitFullscreen();
         }
 
@@ -558,54 +674,6 @@ const firebaseConfig = {
         khuTrinhChieuKeoAnh.addEventListener("pointercancel", ketThucKeoAnh);
         khuTrinhChieuKeoAnh.addEventListener("pointerleave", ketThucKeoAnh);
 
-
-        // Lăn chuột để phóng to / thu nhỏ hình ảnh khi trình chiếu
-        // Bản sửa: bắt sự kiện wheel trên toàn màn hình trình chiếu,
-        // không phụ thuộc con trỏ có nằm đúng vào thẻ .slide-image-container hay không.
-        function xuLyLanChuotThuPhongAnh(e) {
-            const khuTrinhChieu = document.getElementById("khu-vuc-trinh-chieu");
-            if(!khuTrinhChieu || khuTrinhChieu.style.display !== "block") return;
-            if(!dangChieuSlideHinhAnh()) return;
-            if(e.target.closest && e.target.closest('.slide-controls')) return;
-
-            const slideDangChieu = danhSachSlide && danhSachSlide[slideHienTai];
-            const khungAnh = slideDangChieu ? slideDangChieu.querySelector('.slide-image-container') : null;
-            if(!khungAnh) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-
-            const mucCu = mucThuPhongAnh;
-            const heSoZoom = e.deltaY < 0 ? 1.12 : 0.88;
-
-            mucThuPhongAnh = Math.min(
-                mucThuPhongAnhMax,
-                Math.max(mucThuPhongAnhMin, +(mucThuPhongAnh * heSoZoom).toFixed(2))
-            );
-
-            const mucMoi = mucThuPhongAnh;
-            if(mucMoi === mucCu) {
-                capNhatThuPhongAnh();
-                return;
-            }
-
-            // Giữ vị trí con trỏ chuột làm tâm thu/phóng
-            const rect = khungAnh.getBoundingClientRect();
-            const tamX = rect.left + rect.width / 2;
-            const tamY = rect.top + rect.height / 2;
-
-            const chuotX = e.clientX - tamX;
-            const chuotY = e.clientY - tamY;
-
-            viTriAnhX = chuotX - ((chuotX - viTriAnhX) / mucCu) * mucMoi;
-            viTriAnhY = chuotY - ((chuotY - viTriAnhY) / mucCu) * mucMoi;
-
-            capNhatThuPhongAnh();
-        }
-
-        // Dùng capture + passive:false để Chrome cho chặn cuộn mặc định khi đang trình chiếu
-        window.addEventListener("wheel", xuLyLanChuotThuPhongAnh, { passive: false, capture: true });
-
         function chuyenSlide(buoc) {
             if (slideHienTai + buoc >= 0 && slideHienTai + buoc < danhSachSlide.length) {
                 slideHienTai += buoc;
@@ -705,16 +773,19 @@ const firebaseConfig = {
         }
 
         function xuatFileDuLieu() {
-            let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+            const cfg = layCauHinhLoai();
+            let s = cfg.suffix;
             let tenBenh = document.getElementById("in-ten-benh" + s).value.trim();
-            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); return; }
+            if(!tenBenh) { alert(loaiFormHienTai === 'LT' ? "⚠️ Vui lòng nhập Chủ đề lý thuyết trước khi xuất file!" : "⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); return; }
 
             let arrAnh = [];
-            document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
-                let b64 = row.querySelector('.base64-data').value;
-                let note = row.querySelector('.txt-ghichu').value;
-                if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
-            });
+            if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
+                    let b64 = row.querySelector('.base64-data').value;
+                    let note = row.querySelector('.txt-ghichu').value;
+                    if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
+                });
+            }
 
             let duLieu = {
                 khoa: document.getElementById("in-khoa" + s).value, matKhau: document.getElementById("in-mat-khau" + s).value, 
@@ -724,7 +795,7 @@ const firebaseConfig = {
 
             if(loaiFormHienTai === 'BA') {
                 let arrDienBien = [];
-                document.querySelectorAll(".row-dienbien").forEach(row => {
+                document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
                     arrDienBien.push({ tg: row.querySelector('.db-thoigian').value, db: row.querySelector('.db-dienbien').value, xt: row.querySelector('.db-xutri').value });
                 });
                 
@@ -743,9 +814,14 @@ const firebaseConfig = {
                 duLieu.dienBienList = arrDienBien;
             }
 
+            if(loaiFormHienTai === 'LT') {
+                duLieu.noiDungLyThuyet = thuThapDuLieuLyThuyet();
+            }
+
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(duLieu, null, 2));
             let dlNode = document.createElement('a'); dlNode.setAttribute("href", dataStr);
-            dlNode.setAttribute("download", (loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : 'Backup_DonThuoc_') + tenBenh.replace(/\s/g, "_") + ".json");
+            let tenFile = loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : (loaiFormHienTai === 'DT' ? 'Backup_DonThuoc_' : 'Backup_LyThuyet_');
+            dlNode.setAttribute("download", tenFile + tenBenh.replace(/\s/g, "_") + ".json");
             document.body.appendChild(dlNode); dlNode.click(); dlNode.remove();
         }
 
@@ -756,10 +832,12 @@ const firebaseConfig = {
             reader.onload = function(e) {
                 try {
                     let ba = JSON.parse(e.target.result);
-                    let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+                    const cfg = layCauHinhLoai();
+                    let s = cfg.suffix;
                     
                     if(ba.loaiForm && ba.loaiForm !== loaiFormHienTai) {
-                        alert(`❌ File này là của ${ba.loaiForm === 'BA' ? 'Bệnh án' : 'Đơn thuốc'}, bạn đang ở mục khác!`); return;
+                        const tenLoai = { BA: 'Bệnh án', DT: 'Đơn thuốc', LT: 'Lý thuyết' };
+                        alert(`❌ File này là của ${tenLoai[ba.loaiForm] || ba.loaiForm}, bạn đang ở mục khác!`); return;
                     }
 
                     document.getElementById("in-khoa" + s).value = ba.khoa || "";
@@ -785,15 +863,21 @@ const firebaseConfig = {
                         if(ba.dienBienList && ba.dienBienList.length > 0) {
                             ba.dienBienList.forEach(item => {
                                 let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                                div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                                div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${escapeHtml(item.tg || '')}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${escapeHtml(item.db || '')}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${escapeHtml(item.xt || '')}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
                                 document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
                             });
                         } else { themDongDienBien(); }
                     }
 
-                    document.getElementById("danh-sach-anh" + s).innerHTML = "";
-                    if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
-                        ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                    if(loaiFormHienTai === 'LT') {
+                        napDuLieuLyThuyet(ba);
+                    }
+
+                    if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                        document.getElementById("danh-sach-anh" + s).innerHTML = "";
+                        if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
+                            ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                        }
                     }
 
                     capNhatTieuDeBenh();
@@ -891,6 +975,30 @@ const firebaseConfig = {
             thucHienExportPDF('pdf-template-dt', `DonThuoc_${removeAccents(tenBenh.substring(0,20))}_${getTodayStr()}.pdf`);
         }
 
+        function xuatPDFLyThuyet() {
+            let tenBenh = document.getElementById("in-ten-benh-lt").value.trim();
+            if(!tenBenh) { alert("Vui lòng nhập Chủ đề / Tên bài lý thuyết để kết xuất PDF!"); return; }
+            let dsLyThuyet = layDanhSachLyThuyetDeChieu();
+            if(dsLyThuyet.length === 0) { alert("⚠️ Chưa có nội dung lý thuyết để xuất PDF. Vui lòng nhập ít nhất 1 mục nội dung."); return; }
+
+            document.getElementById("pdf-lt-khoa").innerText = document.getElementById("in-khoa-lt").value;
+            document.getElementById("pdf-lt-ma").innerText = maHoSoHienTai || 'LT-' + new Date().getTime().toString().slice(-6);
+            document.getElementById("pdf-lt-chude").innerText = tenBenh;
+            document.getElementById("pdf-lt-nguoitb").innerText = document.getElementById("in-nguoi-trinh-bay-lt").value;
+            document.getElementById("pdf-lt-bacsiky").innerText = document.getElementById("in-nguoi-trinh-bay-lt").value;
+
+            let html = '';
+            dsLyThuyet.forEach(item => {
+                html += `<div class="pdf-section avoid-break" style="margin-top: 16px;">
+                    <strong style="color:#0284c7; font-size:16px;">${escapeHtml(item.tieuDe)}</strong><br>
+                    <span class="pdf-text-block">${escapeHtml(item.noiDung).replace(/\n/g, '<br>')}</span>
+                </div>`;
+            });
+            document.getElementById("pdf-lt-content").innerHTML = html;
+
+            thucHienExportPDF('pdf-template-lt', `LyThuyet_${removeAccents(tenBenh.substring(0,30))}_${getTodayStr()}.pdf`);
+        }
+
         // HÀM LÀM MỊN GIAO DIỆN VÀ XOÁ LỖI TRẮNG FILE TRÊN CLIENT
         function thucHienExportPDF(templateId, fileName) {
             // Bước 1: Hiện màng bảo vệ Loader
@@ -906,6 +1014,7 @@ const firebaseConfig = {
             container.style.display = "block"; 
             document.getElementById('pdf-template-ba').style.display = (templateId === 'pdf-template-ba') ? 'block' : 'none';
             document.getElementById('pdf-template-dt').style.display = (templateId === 'pdf-template-dt') ? 'block' : 'none';
+            document.getElementById('pdf-template-lt').style.display = (templateId === 'pdf-template-lt') ? 'block' : 'none';
 
             let opt = {
                 margin:       [15, 15, 15, 15], // Căn lề trên, trái, dưới, phải (mm)

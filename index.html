@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ Thống Bình Bệnh Án & Đơn Thuốc - Trung tâm Y tế khu vực Hàm Thuận Bắc</title>
+    <title>Hệ Thống Lý Thuyết, Bình Bệnh Án & Bình Đơn Thuốc - Trung tâm Y tế khu vực Hàm Thuận Bắc</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* =========================================
@@ -17,10 +17,10 @@
         .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background-image: url('logott.png'); background-position: center; background-size: 30%; background-repeat: no-repeat; background-blend-mode: overlay; background-color: rgba(224, 242, 254, 0.95); position: fixed; top: 0; left: 0; width: 100vw; z-index: 500; }
         .auth-box { background: white; padding: 40px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--primary-color); }
         
-        .chuc-nang-container { max-width: 850px; margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .grid-chuc-nang { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; width: 100%; }
+        .chuc-nang-container { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .grid-chuc-nang { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; width: 100%; }
         
-        .chuc-nang-card { background: white; border-radius: 20px; padding: 60px 20px; text-align: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 3px solid transparent; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .chuc-nang-card { background: white; border-radius: 20px; padding: 45px 18px; text-align: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 3px solid transparent; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 190px; }
         .chuc-nang-card:hover { transform: translateY(-10px); border-color: var(--primary-color); box-shadow: 0 15px 35px rgba(2, 132, 199, 0.2); }
         .chuc-nang-icon { font-size: 85px; margin-bottom: 25px; transition: transform 0.3s ease; }
         .chuc-nang-card:hover .chuc-nang-icon { transform: scale(1.15); } 
@@ -74,6 +74,18 @@
         .paste-icon { font-size: 30px; margin-bottom: 10px; }
         .paste-text { color: #0284c7; font-weight: bold; font-size: 14px; }
         .preview-img { max-width: 100%; max-height: 180px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 10px; display: none; }
+
+        /* =========================================
+           PHẦN LÝ THUYẾT
+        ========================================= */
+        .theory-help { background: #f0f9ff; border-left: 5px solid var(--primary-color); padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 15px; line-height: 1.5; color: #0f172a; }
+        .theory-help strong { color: var(--primary-color); }
+        .theory-section-title { display: flex; align-items: center; gap: 8px; color: var(--primary-color); font-weight: 900; margin: 0 0 10px 0; font-size: 18px; }
+        .row-lythuyet { flex-direction: column; }
+        .row-lythuyet .lt-title-input { font-weight: 800; color: var(--primary-color); }
+        .slide-theory-topic { color: #dc2626; text-transform: uppercase; font-weight: 900; }
+        .slide-theory-content p { margin: 0 0 18px 0; line-height: 1.45; }
+        .slide-theory-content .bullet-dot { color: var(--primary-color); font-weight: 900; margin-right: 12px; }
 
         /* =========================================
            4. MODAL
@@ -206,7 +218,7 @@
         <div class="auth-box">
             <div style="text-align: center; margin-bottom: 20px;">
                 <img src="logott.png" alt="Logo TTYT" style="width: 80px;">
-                <h2 style="color: var(--primary-color); margin-top: 10px; font-size: 26px;">HỆ THỐNG BÌNH BỆNH ÁN</h2>
+                <h2 style="color: var(--primary-color); margin-top: 10px; font-size: 24px;">HỆ THỐNG LÝ THUYẾT - BÌNH BỆNH ÁN</h2>
             </div>
             <div class="form-group"><label>Tên đăng nhập:</label><input type="text" id="login-username" value="admin"></div>
             <div class="form-group"><label>Mật khẩu:</label><input type="password" id="login-password" value="123456"></div>
@@ -218,6 +230,7 @@
         <div class="chuc-nang-container">
             <h2 style="text-align: center; color: var(--primary-color); margin-bottom: 50px; font-size: 34px;">CHỌN CHỨC NĂNG LÀM VIỆC</h2>
             <div class="grid-chuc-nang">
+                <div class="chuc-nang-card" onclick="vaoFormNhapLieu('LT')"><div class="chuc-nang-icon">📚</div><h3>PHẦN LÝ THUYẾT</h3></div>
                 <div class="chuc-nang-card" onclick="vaoFormNhapLieu('BA')"><div class="chuc-nang-icon">📋</div><h3>BÌNH BỆNH ÁN</h3></div>
                 <div class="chuc-nang-card" onclick="vaoFormNhapLieu('DT')"><div class="chuc-nang-icon">💊</div><h3>BÌNH ĐƠN THUỐC</h3></div>
             </div>
@@ -380,6 +393,121 @@
         </div>
     </div>
 
+
+    <div id="khu-vuc-nhap-lieu-lt" class="khu-vuc-nhap">
+        <h2>NHẬP THÔNG TIN PHẦN LÝ THUYẾT</h2>
+        <div class="subtitle-benh" id="hien-thi-ten-benh-lt">CHỦ ĐỀ LÝ THUYẾT: ..........................</div>
+        
+        <div class="button-group">
+            <button onclick="xuLyLuuHoSo()" class="btn-main btn-success">💾 LƯU LÝ THUYẾT</button>
+            <button onclick="batDauTrinhChieu()" class="btn-main btn-primary">▶ TRÌNH CHIẾU</button>
+            <button onclick="xuatPDFLyThuyet()" class="btn-main btn-pdf">📄 XUẤT PDF</button>
+            <button onclick="moModalTimKiem()" class="btn-main btn-warning">🔍 TÌM KIẾM</button>
+            <button onclick="quayLaiMenu()" class="btn-main btn-danger">🔙 MENU CHÍNH</button>
+        </div>
+
+        <div class="form-section" style="display: none; background-color: #fefce8; border-top-color: #7c3aed;">
+            <h3 style="color: #7c3aed;">⚡ SAO LƯU DỮ LIỆU LÝ THUYẾT</h3>
+            <div style="display: flex; gap: 20px; align-items: flex-end; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>1. Tải File Backup Lý thuyết (.json):</label>
+                    <input type="file" accept=".json" onchange="nhapFileDuLieu(event)" style="border: 2px dashed #7c3aed; padding: 10px; background: white; cursor: pointer;">
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 250px;">
+                    <label>2. Sao lưu dữ liệu đang nhập:</label>
+                    <button onclick="xuatFileDuLieu()" class="btn-main" style="background-color: #0284c7; width: 100%; padding: 12px; margin: 0;">⬇️ XUẤT FILE SAO LƯU</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>I. Cài đặt Trình chiếu</h3>
+            <div class="theory-help">
+                <strong>Cách dùng:</strong> phần lý thuyết được đưa lên đầu quy trình trình chiếu. Người dùng chỉ cần copy nội dung vào các mục có sẵn theo mẫu bài lý thuyết; mục nào để trống thì hệ thống tự bỏ qua, nên không bắt buộc bài bình bệnh án nào cũng phải có lý thuyết.
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label style="color: #dc2626;">Chủ đề / Tên bài lý thuyết (Bắt buộc):</label><input type="text" id="in-ten-benh-lt" class="highlight-input" oninput="capNhatTieuDeBenh()" placeholder="Ví dụ: Sốt xuất huyết Dengue ở trẻ em"></div>
+                <div class="form-group"><label>Người trình bày:</label><input type="text" id="in-nguoi-trinh-bay-lt" value="BS. ....."></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Khoa thực hiện:</label>
+                    <select id="in-khoa-lt">
+                        <option>Khoa Cấp cứu</option>
+                        <option>Khoa Ngoại - Gây mê hồi sức</option>
+                        <option>Khoa Nội Tổng hợp</option>
+                        <option>Khoa Nhi</option>
+                        <option>Khoa Truyền nhiễm</option>
+                        <option>Khoa Chăm sóc sức khỏe sinh sản và Phụ sản - Dinh dưỡng</option>
+                    </select>
+                </div>
+                <div class="form-group"><label style="color: #f59e0b;">🔑 Mật khẩu bảo vệ (Dùng để Xóa):</label><input type="text" id="in-mat-khau-lt" placeholder="Ví dụ: 1234"></div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>II. Nội dung lý thuyết theo mục có sẵn</h3>
+            <div class="form-group">
+                <label class="theory-section-title">📄 I. Căn cứ / Tài liệu chuyên môn</label>
+                <textarea id="in-lt-cancu" rows="3" placeholder="Ví dụ: Quyết định số..., Hướng dẫn chẩn đoán và điều trị..., tài liệu chuyên môn dùng làm căn cứ..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🎯 II. Mục tiêu bài học</label>
+                <textarea id="in-lt-muctieu" rows="4" placeholder="Copy mục tiêu bài học: định nghĩa, nguyên nhân, chẩn đoán, điều trị, dự phòng..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">📌 III. Định nghĩa / Đại cương</label>
+                <textarea id="in-lt-daiduong" rows="5" placeholder="Copy phần định nghĩa, đại cương, khái niệm vào đây..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🦠 IV. Nguyên nhân và yếu tố thuận lợi</label>
+                <textarea id="in-lt-nguyennhan" rows="5" placeholder="Copy nguyên nhân gây bệnh, yếu tố thuận lợi, yếu tố nguy cơ..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🧬 V. Cơ chế bệnh sinh / Đường lây nhiễm</label>
+                <textarea id="in-lt-coche" rows="5" placeholder="Copy cơ chế bệnh sinh, quá trình lây nhiễm, đường xâm nhập, đường lây..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🩺 VI. Chẩn đoán lâm sàng</label>
+                <textarea id="in-lt-lamsang" rows="5" placeholder="Copy triệu chứng cơ năng, triệu chứng thực thể, dấu hiệu lâm sàng..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🔬 VII. Cận lâm sàng / Chẩn đoán hình ảnh</label>
+                <textarea id="in-lt-canlamsang" rows="5" placeholder="Copy xét nghiệm, X-quang, siêu âm, CT, các dấu ấn viêm..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">📊 VIII. Chẩn đoán mức độ nặng / Thang điểm</label>
+                <textarea id="in-lt-mucdonang" rows="5" placeholder="Copy CURB-65, NEWS2, phân tầng mức độ nặng, nơi điều trị, tiên lượng..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🔎 IX. Chẩn đoán phân biệt</label>
+                <textarea id="in-lt-phanbiet" rows="5" placeholder="Copy lao phổi, tắc mạch phổi, ung thư phổi, các bệnh cần phân biệt..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">⚠️ X. Chẩn đoán biến chứng</label>
+                <textarea id="in-lt-bienchung" rows="5" placeholder="Copy biến chứng tại phổi, trong lồng ngực, biến chứng xa..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">💊 XI. Điều trị / Chăm sóc / Theo dõi</label>
+                <textarea id="in-lt-dieutri" rows="5" placeholder="Copy mục tiêu điều trị, nguyên tắc điều trị, kháng sinh, chăm sóc, theo dõi..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">🛡️ XII. Dự phòng / Giáo dục sức khỏe</label>
+                <textarea id="in-lt-phongbenh" rows="5" placeholder="Copy dự phòng, tư vấn, giáo dục sức khỏe, tiêm phòng nếu có..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="theory-section-title">💡 XIII. Ghi nhớ / Câu hỏi thảo luận</label>
+                <textarea id="in-lt-banluan" rows="4" placeholder="Copy điểm cần nhớ, câu hỏi thảo luận, kết luận..."></textarea>
+            </div>
+        </div>
+        <div class="form-section">
+            <h3>III. Mục bổ sung tùy chọn</h3>
+            <div class="theory-help">Dùng phần này khi bài lý thuyết có mục riêng không nằm trong mẫu, ví dụ: “Tình huống minh họa”, “Sai sót thường gặp”, “Quy trình tại khoa”...</div>
+            <div id="danh-sach-muc-lt"></div>
+            <button class="btn-add-row" onclick="themDongMucLyThuyet()">+ Thêm mục lý thuyết tùy chọn</button>
+        </div>
+    </div>
+
     <div id="modal-luu" class="modal-overlay">
         <div class="modal-content">
             <h3 style="color:var(--success-color)">✅ LƯU THÀNH CÔNG</h3>
@@ -467,6 +595,15 @@
                     <p style="margin-top: 40px;"><strong>THÔNG TIN ĐƠN THUỐC:</strong> <span id="out-ten-benh-dt" style="color: red; text-transform: uppercase;"></span></p>
                     <p><strong>KHOA THỰC HIỆN:</strong> <span id="out-khoa-dt-slide"></span></p>
                     <p><strong>NGƯỜI TRÌNH BÀY:</strong> <span id="out-nguoi-tb-dt-slide"></span></p>
+                </div>
+            </div>
+
+            <div class="slide slide-lt" id="slide-gioithieu-lt">
+                <div class="slide-header">📚 PHẦN LÝ THUYẾT</div>
+                <div class="slide-content">
+                    <p><strong>CHỦ ĐỀ:</strong> <span id="out-chu-de-lt" class="slide-theory-topic"></span></p>
+                    <p><strong>KHOA THỰC HIỆN:</strong> <span id="out-khoa-lt-slide"></span></p>
+                    <p><strong>NGƯỜI TRÌNH BÀY:</strong> <span id="out-nguoi-tb-lt-slide"></span></p>
                 </div>
             </div>
         </div>
@@ -575,6 +712,36 @@
                 </div>
             </div>
         </div>
+
+        <div id="pdf-template-lt" style="display:none; position: relative;">
+            <div class="pdf-watermark">TTYT KV HÀM THUẬN BẮC</div>
+            <div class="pdf-header">
+                <div class="pdf-header-left">
+                    SỞ Y TẾ LÂM ĐỒNG<br>
+                    <strong>TTYT KV HÀM THUẬN BẮC</strong><br>
+                    Khoa: <span id="pdf-lt-khoa"></span>
+                </div>
+                <div class="pdf-header-right">
+                    Cộng Hòa Xã Hội Chủ Nghĩa Việt Nam<br>
+                    Độc lập - Tự do - Hạnh phúc<br>
+                    <span style="font-weight: normal; font-size: 12px;">Mã LT: <span id="pdf-lt-ma"></span></span>
+                </div>
+            </div>
+            <div class="pdf-title">NỘI DUNG PHẦN LÝ THUYẾT</div>
+            <div class="pdf-section">
+                <strong>Chủ đề:</strong> <strong style="color:red;"><span id="pdf-lt-chude"></span></strong><br>
+                <strong>Người trình bày:</strong> <span id="pdf-lt-nguoitb"></span>
+            </div>
+            <div id="pdf-lt-content"></div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 40px; text-align: center; page-break-inside: avoid;">
+                <div style="width: 250px;">
+                    <em>Ngày ...... tháng ...... năm 202...</em><br>
+                    <strong>NGƯỜI TRÌNH BÀY</strong><br>
+                    <br><br><br><br>
+                    <span id="pdf-lt-bacsiky" style="font-weight: bold;"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -595,12 +762,43 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let loaiFormHienTai = 'BA'; 
+        let loaiFormHienTai = 'LT'; 
         let slideHienTai = 0;
         let danhSachSlide = [];
         let trangThaiDaLuu = false; 
         let maHoSoHienTai = "";
         let duLieuTamThoi = []; 
+
+        const cauHinhLoaiForm = {
+            BA: { suffix: '-ba', formId: 'khu-vuc-nhap-lieu-ba', path: 'DanhSachBenhAn', maPrefix: 'BA-', inputTen: 'in-ten-benh-ba', inputMatKhau: 'in-mat-khau-ba', inputNguoi: 'in-nguoi-trinh-bay-ba', inputKhoa: 'in-khoa-ba', hienThi: 'hien-thi-ten-benh-ba', prefixHienThi: 'TÊN BỆNH: ', tenChucNang: 'Bệnh án', titleTimKiem: '🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU' },
+            DT: { suffix: '-dt', formId: 'khu-vuc-nhap-lieu-dt', path: 'DanhSachDonThuoc', maPrefix: 'DT-', inputTen: 'in-ten-benh-dt', inputMatKhau: 'in-mat-khau-dt', inputNguoi: 'in-nguoi-trinh-bay-dt', inputKhoa: 'in-khoa-dt', hienThi: 'hien-thi-ten-benh-dt', prefixHienThi: 'THÔNG TIN ĐƠN THUỐC: ', tenChucNang: 'Đơn thuốc', titleTimKiem: '🔍 QUẢN LÝ ĐƠN THUỐC ĐÃ LƯU' },
+            LT: { suffix: '-lt', formId: 'khu-vuc-nhap-lieu-lt', path: 'DanhSachLyThuyet', maPrefix: 'LT-', inputTen: 'in-ten-benh-lt', inputMatKhau: 'in-mat-khau-lt', inputNguoi: 'in-nguoi-trinh-bay-lt', inputKhoa: 'in-khoa-lt', hienThi: 'hien-thi-ten-benh-lt', prefixHienThi: 'CHỦ ĐỀ LÝ THUYẾT: ', tenChucNang: 'Lý thuyết', titleTimKiem: '🔍 QUẢN LÝ PHẦN LÝ THUYẾT ĐÃ LƯU' }
+        };
+
+        const mucLyThuyetCoSan = [
+            { key: 'canCu', id: 'in-lt-cancu', tieuDe: '📄 I. CĂN CỨ / TÀI LIỆU CHUYÊN MÔN' },
+            { key: 'mucTieu', id: 'in-lt-muctieu', tieuDe: '🎯 II. MỤC TIÊU BÀI HỌC' },
+            { key: 'daiCuong', id: 'in-lt-daiduong', tieuDe: '📌 III. ĐỊNH NGHĨA / ĐẠI CƯƠNG' },
+            { key: 'nguyenNhan', id: 'in-lt-nguyennhan', tieuDe: '🦠 IV. NGUYÊN NHÂN VÀ YẾU TỐ THUẬN LỢI' },
+            { key: 'coChe', id: 'in-lt-coche', tieuDe: '🧬 V. CƠ CHẾ BỆNH SINH / ĐƯỜNG LÂY NHIỄM' },
+            { key: 'lamSang', id: 'in-lt-lamsang', tieuDe: '🩺 VI. CHẨN ĐOÁN LÂM SÀNG' },
+            { key: 'canLamSang', id: 'in-lt-canlamsang', tieuDe: '🔬 VII. CẬN LÂM SÀNG / CHẨN ĐOÁN HÌNH ẢNH' },
+            { key: 'mucDoNang', id: 'in-lt-mucdonang', tieuDe: '📊 VIII. CHẨN ĐOÁN MỨC ĐỘ NẶNG / THANG ĐIỂM' },
+            { key: 'phanBiet', id: 'in-lt-phanbiet', tieuDe: '🔎 IX. CHẨN ĐOÁN PHÂN BIỆT' },
+            { key: 'bienChung', id: 'in-lt-bienchung', tieuDe: '⚠️ X. CHẨN ĐOÁN BIẾN CHỨNG' },
+            { key: 'dieuTri', id: 'in-lt-dieutri', tieuDe: '💊 XI. ĐIỀU TRỊ / CHĂM SÓC / THEO DÕI' },
+            { key: 'phongBenh', id: 'in-lt-phongbenh', tieuDe: '🛡️ XII. DỰ PHÒNG / GIÁO DỤC SỨC KHỎE' },
+            { key: 'banLuan', id: 'in-lt-banluan', tieuDe: '💡 XIII. GHI NHỚ / CÂU HỎI THẢO LUẬN' }
+        ];
+
+        function layCauHinhLoai(loai = loaiFormHienTai) { return cauHinhLoaiForm[loai] || cauHinhLoaiForm.BA; }
+        function layGiaTri(id) { return (document.getElementById(id)?.value || '').trim(); }
+        function ganGiaTri(id, val) { const el = document.getElementById(id); if(el) el.value = val || ''; }
+        function escapeHtml(text) {
+            return String(text || '').replace(/[&<>"']/g, function(ch) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+            });
+        }
 
         // KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP KHI MỞ/TẢI LẠI TRANG
         window.onload = function() {
@@ -621,9 +819,15 @@
             location.reload(); 
         }
 
+        function anTatCaFormNhapLieu() {
+            Object.values(cauHinhLoaiForm).forEach(cfg => {
+                const form = document.getElementById(cfg.formId);
+                if(form) form.style.display = "none";
+            });
+        }
+
         function quayLaiMenu() {
-            document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "none";
-            document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "none";
+            anTatCaFormNhapLieu();
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "block";
         }
         
@@ -632,17 +836,13 @@
             loaiFormHienTai = loai;
             maHoSoHienTai = ""; 
             trangThaiDaLuu = false;
-
-            if(loai === 'BA') {
-                document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "block";
-                document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "none";
-            } else {
-                document.getElementById("khu-vuc-nhap-lieu-ba").style.display = "none";
-                document.getElementById("khu-vuc-nhap-lieu-dt").style.display = "block";
-            }
+            anTatCaFormNhapLieu();
+            const cfg = layCauHinhLoai(loai);
+            document.getElementById(cfg.formId).style.display = "block";
+            capNhatTieuDeBenh();
         }
         
-        function xoaDong(btn) { btn.parentElement.parentElement.remove(); }
+        function xoaDong(btn) { btn.closest('.dynamic-row')?.remove(); }
 
         // ==========================================
         // CÔNG CỤ NÉN ẢNH CHỐNG NẶNG MÁY
@@ -744,11 +944,65 @@
             document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
         }
 
+        function themDongMucLyThuyet(savedTieuDe = "", savedNoiDung = "") {
+            let div = document.createElement("div");
+            div.className = "dynamic-row row-lythuyet";
+            div.innerHTML = `
+                <div class="form-group" style="margin-bottom: 8px; width: 100%;">
+                    <label>Tiêu đề mục bổ sung:</label>
+                    <input type="text" class="lt-title-input" placeholder="Ví dụ: IX. Tình huống minh họa" value="${escapeHtml(savedTieuDe)}">
+                </div>
+                <div class="form-group" style="margin-bottom: 8px; width: 100%;">
+                    <label>Nội dung:</label>
+                    <textarea class="lt-content-input" rows="5" placeholder="Copy nội dung mục bổ sung vào đây...">${escapeHtml(savedNoiDung)}</textarea>
+                </div>
+                <button class="btn-delete-row" onclick="xoaDong(this)" style="width: 160px; align-self: flex-end;">Xóa mục này</button>
+            `;
+            document.getElementById("danh-sach-muc-lt").appendChild(div);
+        }
+
+        function thuThapDuLieuLyThuyet() {
+            let noiDungLyThuyet = {};
+            mucLyThuyetCoSan.forEach(muc => { noiDungLyThuyet[muc.key] = layGiaTri(muc.id); });
+            noiDungLyThuyet.mucBoSung = [];
+            document.querySelectorAll("#danh-sach-muc-lt .row-lythuyet").forEach(row => {
+                let tieuDe = row.querySelector('.lt-title-input')?.value.trim() || '';
+                let noiDung = row.querySelector('.lt-content-input')?.value.trim() || '';
+                if(tieuDe || noiDung) noiDungLyThuyet.mucBoSung.push({ tieuDe, noiDung });
+            });
+            return noiDungLyThuyet;
+        }
+
+        function napDuLieuLyThuyet(duLieu) {
+            mucLyThuyetCoSan.forEach(muc => { ganGiaTri(muc.id, duLieu?.noiDungLyThuyet?.[muc.key] || duLieu?.[muc.key] || ''); });
+            document.getElementById("danh-sach-muc-lt").innerHTML = "";
+            let dsBoSung = duLieu?.noiDungLyThuyet?.mucBoSung || duLieu?.mucBoSung || [];
+            dsBoSung.forEach(item => themDongMucLyThuyet(item.tieuDe || '', item.noiDung || ''));
+        }
+
+        function layDanhSachLyThuyetDeChieu() {
+            let ds = mucLyThuyetCoSan.map(muc => ({ tieuDe: muc.tieuDe, noiDung: layGiaTri(muc.id) }));
+            document.querySelectorAll("#danh-sach-muc-lt .row-lythuyet").forEach((row, idx) => {
+                let tieuDe = row.querySelector('.lt-title-input')?.value.trim() || `MỤC BỔ SUNG ${idx + 1}`;
+                let noiDung = row.querySelector('.lt-content-input')?.value.trim() || '';
+                if(tieuDe || noiDung) ds.push({ tieuDe, noiDung });
+            });
+            return ds.filter(item => item.noiDung && item.noiDung.trim());
+        }
+
+        function dinhDangNoiDungLyThuyet(noiDung) {
+            let dong = String(noiDung || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+            if(dong.length === 0) return '<p><i>Chưa nhập nội dung.</i></p>';
+            return dong.map(line => {
+                let clean = escapeHtml(line).replace(/^[-•+*]\s*/, '');
+                return `<p><span class="bullet-dot">•</span>${clean}</p>`;
+            }).join('');
+        }
+
         function capNhatTieuDeBenh() {
-            let val = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value;
-            let hienThiId = loaiFormHienTai === 'BA' ? "hien-thi-ten-benh-ba" : "hien-thi-ten-benh-dt";
-            let prefix = loaiFormHienTai === 'BA' ? "TÊN BỆNH: " : "THÔNG TIN ĐƠN THUỐC: ";
-            document.getElementById(hienThiId).innerText = val ? prefix + val.toUpperCase() : prefix + "..........................";
+            const cfg = layCauHinhLoai();
+            let val = document.getElementById(cfg.inputTen)?.value || '';
+            document.getElementById(cfg.hienThi).innerText = val ? cfg.prefixHienThi + val.toUpperCase() : cfg.prefixHienThi + "..........................";
             trangThaiDaLuu = false; 
         }
 
@@ -756,26 +1010,28 @@
         // LOGIC LƯU LÊN FIREBASE (BA & DT)
         // ==========================================
         function xuLyLuuHoSo() {
-            let tenBenh = document.getElementById(loaiFormHienTai === 'BA' ? "in-ten-benh-ba" : "in-ten-benh-dt").value.trim();
-            let matKhau = document.getElementById(loaiFormHienTai === 'BA' ? "in-mat-khau-ba" : "in-mat-khau-dt").value.trim();
-            let nguoiTrinhBay = document.getElementById(loaiFormHienTai === 'BA' ? "in-nguoi-trinh-bay-ba" : "in-nguoi-trinh-bay-dt").value.trim();
-            let khoa = document.getElementById(loaiFormHienTai === 'BA' ? "in-khoa-ba" : "in-khoa-dt").value;
+            const cfg = layCauHinhLoai();
+            let tenBenh = layGiaTri(cfg.inputTen);
+            let matKhau = layGiaTri(cfg.inputMatKhau);
+            let nguoiTrinhBay = layGiaTri(cfg.inputNguoi);
+            let khoa = document.getElementById(cfg.inputKhoa).value;
             
-            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh/Chẩn đoán!"); return; }
+            if(!tenBenh) { alert(loaiFormHienTai === 'LT' ? "Vui lòng nhập Chủ đề / Tên bài lý thuyết!" : "Vui lòng nhập Tên bệnh/Chẩn đoán!"); return; }
             if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm!"); return; }
 
             if(!maHoSoHienTai) {
-                let p = loaiFormHienTai === 'BA' ? 'BA-' : 'DT-';
-                maHoSoHienTai = p + new Date().getTime().toString().slice(-6);
+                maHoSoHienTai = cfg.maPrefix + new Date().getTime().toString().slice(-6);
             }
 
             let arrAnh = [];
-            let listAnhId = loaiFormHienTai === 'BA' ? '#danh-sach-anh-ba .row-anh' : '#danh-sach-anh-dt .row-anh';
-            document.querySelectorAll(listAnhId).forEach(row => {
-                let b64 = row.querySelector('.base64-data').value;
-                let note = row.querySelector('.txt-ghichu').value;
-                if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
-            });
+            if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                let listAnhId = '#danh-sach-anh' + cfg.suffix + ' .row-anh';
+                document.querySelectorAll(listAnhId).forEach(row => {
+                    let b64 = row.querySelector('.base64-data').value;
+                    let note = row.querySelector('.txt-ghichu').value;
+                    if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
+                });
+            }
 
             let duLieu = {
                 id: maHoSoHienTai, khoa: khoa, matKhau: matKhau, tenBenh: tenBenh,
@@ -785,7 +1041,7 @@
 
             if (loaiFormHienTai === 'BA') {
                 let arrDienBien = [];
-                document.querySelectorAll(".row-dienbien").forEach(row => {
+                document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
                     arrDienBien.push({
                         tg: row.querySelector('.db-thoigian').value,
                         db: row.querySelector('.db-dienbien').value,
@@ -808,8 +1064,11 @@
                 duLieu.dienBienList = arrDienBien;
             }
 
-            let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn/' : 'DanhSachDonThuoc/';
-            db.ref(path + maHoSoHienTai).set(duLieu)
+            if (loaiFormHienTai === 'LT') {
+                duLieu.noiDungLyThuyet = thuThapDuLieuLyThuyet();
+            }
+
+            db.ref(cfg.path + '/' + maHoSoHienTai).set(duLieu)
                 .then(() => {
                     document.getElementById("modal-ma-ba").innerText = maHoSoHienTai;
                     document.getElementById("modal-luu").style.display = "flex";
@@ -822,12 +1081,12 @@
         // TÌM KIẾM THEO CHUYÊN MỤC
         // ==========================================
         function moModalTimKiem() {
+            const cfg = layCauHinhLoai();
             document.getElementById("danh-sach-kq").innerHTML = "<p style='text-align:center; color:#0284c7;'>⏳ Đang tải dữ liệu từ máy chủ...</p>";
-            document.getElementById("title-modal-tim-kiem").innerText = loaiFormHienTai === 'BA' ? "🔍 QUẢN LÝ BỆNH ÁN ĐÃ LƯU" : "🔍 QUẢN LÝ ĐƠN THUỐC ĐÃ LƯU";
+            document.getElementById("title-modal-tim-kiem").innerText = cfg.titleTimKiem;
             document.getElementById("modal-tim-kiem").style.display = "flex";
 
-            let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn' : 'DanhSachDonThuoc';
-            db.ref(path).get().then((snapshot) => {
+            db.ref(cfg.path).get().then((snapshot) => {
                 if (snapshot.exists()) {
                     let data = snapshot.val();
                     duLieuTamThoi = Object.values(data).filter(item => item && item.id);
@@ -836,8 +1095,8 @@
                         h += `
                         <div class="search-item">
                             <div class="search-item-info" onclick="taiDuLieu('${ba.id}')">
-                                <strong>${ba.id}</strong> - ${ba.tenBenh} <br>
-                                <span style="font-size: 14px; color: #64748b;">${ba.khoa} | BS: ${ba.nguoiTrinhBay} | Lưu lúc: ${ba.ngayTao || ''}</span>
+                                <strong>${escapeHtml(ba.id)}</strong> - ${escapeHtml(ba.tenBenh || '')} <br>
+                                <span style="font-size: 14px; color: #64748b;">${escapeHtml(ba.khoa || '')} | Người trình bày: ${escapeHtml(ba.nguoiTrinhBay || '')} | Lưu lúc: ${escapeHtml(ba.ngayTao || '')}</span>
                             </div>
                             <button class="btn-delete-ba" onclick="xoaBenhAn('${ba.id}', event)">🗑️ Xóa</button>
                         </div>`;
@@ -853,19 +1112,20 @@
 
         function xoaBenhAn(id, event) {
             event.stopPropagation(); 
+            const cfg = layCauHinhLoai();
             let ba = duLieuTamThoi.find(x => x.id === id);
             if(!ba) return;
 
             if(ba.matKhau) {
-                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.\nVui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:`);
+                let mkNhap = prompt(`🔒 Hồ sơ [${ba.tenBenh}] đang được bảo vệ.
+Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:`);
                 if(mkNhap === null) return; 
                 if(mkNhap !== ba.matKhau) { alert("❌ MẬT KHẨU KHÔNG ĐÚNG! Bạn không có quyền xóa hồ sơ này."); return; }
             }
 
             let xacNhan = confirm(`⚠️ Bạn có chắc chắn XÓA VĨNH VIỄN hồ sơ [${id}] khỏi hệ thống trực tuyến không?`);
             if(xacNhan) {
-                let path = loaiFormHienTai === 'BA' ? 'DanhSachBenhAn/' : 'DanhSachDonThuoc/';
-                db.ref(path + id).remove()
+                db.ref(cfg.path + '/' + id).remove()
                     .then(() => {
                         alert("Đã xóa hồ sơ thành công!");
                         if(maHoSoHienTai === id) maHoSoHienTai = "";
@@ -881,13 +1141,14 @@
         function taiDuLieu(id) {
             let ba = duLieuTamThoi.find(x => x.id === id);
             if(ba) {
+                const cfg = layCauHinhLoai();
                 maHoSoHienTai = ba.id;
-                let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+                let s = cfg.suffix;
                 
-                document.getElementById("in-khoa" + s).value = ba.khoa;
+                document.getElementById("in-khoa" + s).value = ba.khoa || "";
                 document.getElementById("in-mat-khau" + s).value = ba.matKhau || "";
-                document.getElementById("in-ten-benh" + s).value = ba.tenBenh;
-                document.getElementById("in-nguoi-trinh-bay" + s).value = ba.nguoiTrinhBay;
+                document.getElementById("in-ten-benh" + s).value = ba.tenBenh || "";
+                document.getElementById("in-nguoi-trinh-bay" + s).value = ba.nguoiTrinhBay || "";
 
                 if(loaiFormHienTai === 'BA') {
                     document.getElementById("in-ten-ba").value = ba.tenBN || "";
@@ -904,18 +1165,24 @@
                     document.getElementById("in-banluan-ba").value = ba.banluan || "";
 
                     document.getElementById("danh-sach-dien-bien-ba").innerHTML = "";
-                    if(ba.dienBienList) {
+                    if(ba.dienBienList && ba.dienBienList.length > 0) {
                         ba.dienBienList.forEach(item => {
                             let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                            div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${escapeHtml(item.tg || '')}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${escapeHtml(item.db || '')}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${escapeHtml(item.xt || '')}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
                             document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
                         });
                     }
                 }
 
-                document.getElementById("danh-sach-anh" + s).innerHTML = "";
-                if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
-                    ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                if(loaiFormHienTai === 'LT') {
+                    napDuLieuLyThuyet(ba);
+                }
+
+                if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                    document.getElementById("danh-sach-anh" + s).innerHTML = "";
+                    if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
+                        ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                    }
                 }
 
                 capNhatTieuDeBenh(); trangThaiDaLuu = true; 
@@ -929,11 +1196,13 @@
         function batDauTrinhChieu() {
             if(!trangThaiDaLuu) { alert("⛔ BẠN CHƯA LƯU DỮ LIỆU LÊN HỆ THỐNG!"); return; }
 
-            let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
-            document.getElementById("out-khoa-welcome").innerText = document.getElementById("in-khoa" + s).value.toUpperCase();
-            document.getElementById("out-welcome-title").innerText = loaiFormHienTai === 'BA' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨" : "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH ĐƠN THUỐC ✨";
-            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById("in-nguoi-trinh-bay" + s).value;
+            const cfg = layCauHinhLoai();
+            let s = cfg.suffix;
+            document.getElementById("out-khoa-welcome").innerText = document.getElementById(cfg.inputKhoa).value.toUpperCase();
+            document.getElementById("out-welcome-title").innerText = loaiFormHienTai === 'BA' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH BỆNH ÁN ✨" : (loaiFormHienTai === 'DT' ? "✨ CHÀO MỪNG ĐẾN VỚI BUỔI BÌNH ĐƠN THUỐC ✨" : "✨ CHÀO MỪNG ĐẾN VỚI PHẦN LÝ THUYẾT ✨");
+            document.getElementById("out-nguoi-trinh-bay").innerText = document.getElementById(cfg.inputNguoi).value;
 
+            document.querySelectorAll('.slide-anh-dong, .slide-lt-dong').forEach(e => e.remove());
             document.querySelectorAll('.slide').forEach(e => {
                 e.classList.remove('slide-active-target');
                 e.style.display = 'none';
@@ -956,50 +1225,69 @@
                 document.getElementById("out-banluan-ba").innerText = document.getElementById("in-banluan-ba").value;
 
                 let htmlBang = `<table class="tb-dienbien"><tr><th>THỜI GIAN</th><th>DIỄN BIẾN</th><th>XỬ TRÍ</th></tr>`;
-                document.querySelectorAll(".row-dienbien").forEach(row => {
-                    let tg = row.querySelector('.db-thoigian').value;
-                    let db = row.querySelector('.db-dienbien').value.replace(/\n/g, "<br>");
-                    let xt = row.querySelector('.db-xutri').value.replace(/\n/g, "<br>");
+                document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
+                    let tg = escapeHtml(row.querySelector('.db-thoigian').value);
+                    let db = escapeHtml(row.querySelector('.db-dienbien').value).replace(/\n/g, "<br>");
+                    let xt = escapeHtml(row.querySelector('.db-xutri').value).replace(/\n/g, "<br>");
                     if(tg || db || xt) htmlBang += `<tr><td>${tg}</td><td>${db}</td><td>${xt}</td></tr>`;
                 });
                 htmlBang += `</table>`;
                 document.getElementById("out-bang-dienbien-ba").innerHTML = htmlBang;
 
                 document.querySelectorAll('.slide-ba').forEach(e => e.classList.add('slide-active-target'));
-            } else {
+            } else if(loaiFormHienTai === 'DT') {
                 document.getElementById("out-ten-benh-dt").innerText = document.getElementById("in-ten-benh-dt").value;
                 document.getElementById("out-khoa-dt-slide").innerText = document.getElementById("in-khoa-dt").value;
                 document.getElementById("out-nguoi-tb-dt-slide").innerText = document.getElementById("in-nguoi-trinh-bay-dt").value;
 
                 document.querySelectorAll('.slide-dt').forEach(e => e.classList.add('slide-active-target'));
+            } else if(loaiFormHienTai === 'LT') {
+                let dsLyThuyet = layDanhSachLyThuyetDeChieu();
+                if(dsLyThuyet.length === 0) { alert("⚠️ Chưa có nội dung lý thuyết để trình chiếu. Vui lòng nhập ít nhất 1 mục nội dung."); return; }
+                document.getElementById("out-chu-de-lt").innerText = document.getElementById("in-ten-benh-lt").value;
+                document.getElementById("out-khoa-lt-slide").innerText = document.getElementById("in-khoa-lt").value;
+                document.getElementById("out-nguoi-tb-lt-slide").innerText = document.getElementById("in-nguoi-trinh-bay-lt").value;
+
+                const container = document.getElementById("slide-container");
+                dsLyThuyet.forEach(item => {
+                    let newSlide = document.createElement('div');
+                    newSlide.className = 'slide slide-lt-dong slide-active-target';
+                    newSlide.innerHTML = `
+                        <div class="slide-header">${escapeHtml(item.tieuDe)}</div>
+                        <div class="slide-content slide-theory-content">${dinhDangNoiDungLyThuyet(item.noiDung)}</div>
+                    `;
+                    container.appendChild(newSlide);
+                });
+                document.querySelectorAll('.slide-lt').forEach(e => e.classList.add('slide-active-target'));
             }
 
-            document.querySelectorAll('.slide-anh-dong').forEach(e => e.remove());
-            let container = document.getElementById("slide-container");
-            let anhRows = document.querySelectorAll('#danh-sach-anh' + s + ' .row-anh');
+            if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                let container = document.getElementById("slide-container");
+                let anhRows = document.querySelectorAll('#danh-sach-anh' + s + ' .row-anh');
 
-            for(let row of anhRows) {
-                let base64 = row.querySelector('.base64-data').value;
-                let ghiChu = row.querySelector('.txt-ghichu').value;
-                
-                if (base64) {
-                    let newSlide = document.createElement('div');
-                    newSlide.className = 'slide slide-anh-dong slide-active-target'; 
-                    let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
-                    newSlide.innerHTML = `
-                        <div class="slide-header">${titleStr}</div>
-                        <div class="slide-content image-slide-content" style="display: flex; flex-direction: column;">
-                            <div class="slide-image-container">
-                                <img src="${base64}">
-                                ${ghiChu ? `<div class="slide-image-note">${ghiChu}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
+                for(let row of anhRows) {
+                    let base64 = row.querySelector('.base64-data').value;
+                    let ghiChu = row.querySelector('.txt-ghichu').value;
                     
-                    if(loaiFormHienTai === 'BA') {
-                        container.insertBefore(newSlide, document.getElementById('slide-tomtat-ba'));
-                    } else {
-                        container.appendChild(newSlide);
+                    if (base64) {
+                        let newSlide = document.createElement('div');
+                        newSlide.className = 'slide slide-anh-dong slide-active-target'; 
+                        let titleStr = loaiFormHienTai === 'BA' ? '📸 IV. HÌNH ẢNH CẬN LÂM SÀNG' : '📸 II. HÌNH ẢNH ĐƠN THUỐC';
+                        newSlide.innerHTML = `
+                            <div class="slide-header">${titleStr}</div>
+                            <div class="slide-content image-slide-content" style="display: flex; flex-direction: column;">
+                                <div class="slide-image-container">
+                                    <img src="${base64}">
+                                    ${ghiChu ? `<div class="slide-image-note">${escapeHtml(ghiChu)}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                        
+                        if(loaiFormHienTai === 'BA') {
+                            container.insertBefore(newSlide, document.getElementById('slide-tomtat-ba'));
+                        } else {
+                            container.appendChild(newSlide);
+                        }
                     }
                 }
             }
@@ -1016,7 +1304,7 @@
 
         function ketThucTrinhChieu() {
             document.getElementById("khu-vuc-trinh-chieu").style.display = "none";
-            document.getElementById(loaiFormHienTai === 'BA' ? "khu-vuc-nhap-lieu-ba" : "khu-vuc-nhap-lieu-dt").style.display = "block";
+            document.getElementById(layCauHinhLoai().formId).style.display = "block";
             if (document.exitFullscreen) document.exitFullscreen();
         }
 
@@ -1240,16 +1528,19 @@
         }
 
         function xuatFileDuLieu() {
-            let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+            const cfg = layCauHinhLoai();
+            let s = cfg.suffix;
             let tenBenh = document.getElementById("in-ten-benh" + s).value.trim();
-            if(!tenBenh) { alert("⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); return; }
+            if(!tenBenh) { alert(loaiFormHienTai === 'LT' ? "⚠️ Vui lòng nhập Chủ đề lý thuyết trước khi xuất file!" : "⚠️ Vui lòng nhập Tên bệnh/Thông tin đơn thuốc trước khi xuất file!"); return; }
 
             let arrAnh = [];
-            document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
-                let b64 = row.querySelector('.base64-data').value;
-                let note = row.querySelector('.txt-ghichu').value;
-                if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
-            });
+            if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                document.querySelectorAll("#danh-sach-anh" + s + " .row-anh").forEach(row => {
+                    let b64 = row.querySelector('.base64-data').value;
+                    let note = row.querySelector('.txt-ghichu').value;
+                    if(b64 || note) arrAnh.push({ base64: b64, ghiChu: note });
+                });
+            }
 
             let duLieu = {
                 khoa: document.getElementById("in-khoa" + s).value, matKhau: document.getElementById("in-mat-khau" + s).value, 
@@ -1259,7 +1550,7 @@
 
             if(loaiFormHienTai === 'BA') {
                 let arrDienBien = [];
-                document.querySelectorAll(".row-dienbien").forEach(row => {
+                document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
                     arrDienBien.push({ tg: row.querySelector('.db-thoigian').value, db: row.querySelector('.db-dienbien').value, xt: row.querySelector('.db-xutri').value });
                 });
                 
@@ -1278,9 +1569,14 @@
                 duLieu.dienBienList = arrDienBien;
             }
 
+            if(loaiFormHienTai === 'LT') {
+                duLieu.noiDungLyThuyet = thuThapDuLieuLyThuyet();
+            }
+
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(duLieu, null, 2));
             let dlNode = document.createElement('a'); dlNode.setAttribute("href", dataStr);
-            dlNode.setAttribute("download", (loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : 'Backup_DonThuoc_') + tenBenh.replace(/\s/g, "_") + ".json");
+            let tenFile = loaiFormHienTai === 'BA' ? 'Backup_HSBA_' : (loaiFormHienTai === 'DT' ? 'Backup_DonThuoc_' : 'Backup_LyThuyet_');
+            dlNode.setAttribute("download", tenFile + tenBenh.replace(/\s/g, "_") + ".json");
             document.body.appendChild(dlNode); dlNode.click(); dlNode.remove();
         }
 
@@ -1291,10 +1587,12 @@
             reader.onload = function(e) {
                 try {
                     let ba = JSON.parse(e.target.result);
-                    let s = loaiFormHienTai === 'BA' ? '-ba' : '-dt';
+                    const cfg = layCauHinhLoai();
+                    let s = cfg.suffix;
                     
                     if(ba.loaiForm && ba.loaiForm !== loaiFormHienTai) {
-                        alert(`❌ File này là của ${ba.loaiForm === 'BA' ? 'Bệnh án' : 'Đơn thuốc'}, bạn đang ở mục khác!`); return;
+                        const tenLoai = { BA: 'Bệnh án', DT: 'Đơn thuốc', LT: 'Lý thuyết' };
+                        alert(`❌ File này là của ${tenLoai[ba.loaiForm] || ba.loaiForm}, bạn đang ở mục khác!`); return;
                     }
 
                     document.getElementById("in-khoa" + s).value = ba.khoa || "";
@@ -1320,15 +1618,21 @@
                         if(ba.dienBienList && ba.dienBienList.length > 0) {
                             ba.dienBienList.forEach(item => {
                                 let div = document.createElement("div"); div.className = "dynamic-row row-dienbien";
-                                div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${item.tg}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${item.db}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${item.xt}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
+                                div.innerHTML = `<div style="flex:1;"><input type="text" class="db-thoigian" value="${escapeHtml(item.tg || '')}"></div><div style="flex:2;"><textarea class="db-dienbien" rows="3">${escapeHtml(item.db || '')}</textarea></div><div style="flex:2;"><textarea class="db-xutri" rows="3">${escapeHtml(item.xt || '')}</textarea></div><button class="btn-delete-row" onclick="xoaDong(this)">Xóa</button>`;
                                 document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
                             });
                         } else { themDongDienBien(); }
                     }
 
-                    document.getElementById("danh-sach-anh" + s).innerHTML = "";
-                    if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
-                        ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                    if(loaiFormHienTai === 'LT') {
+                        napDuLieuLyThuyet(ba);
+                    }
+
+                    if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
+                        document.getElementById("danh-sach-anh" + s).innerHTML = "";
+                        if(ba.danhSachAnh && ba.danhSachAnh.length > 0) {
+                            ba.danhSachAnh.forEach(anh => { themDongAnh(anh.base64, anh.ghiChu); });
+                        }
                     }
 
                     capNhatTieuDeBenh();
@@ -1426,6 +1730,30 @@
             thucHienExportPDF('pdf-template-dt', `DonThuoc_${removeAccents(tenBenh.substring(0,20))}_${getTodayStr()}.pdf`);
         }
 
+        function xuatPDFLyThuyet() {
+            let tenBenh = document.getElementById("in-ten-benh-lt").value.trim();
+            if(!tenBenh) { alert("Vui lòng nhập Chủ đề / Tên bài lý thuyết để kết xuất PDF!"); return; }
+            let dsLyThuyet = layDanhSachLyThuyetDeChieu();
+            if(dsLyThuyet.length === 0) { alert("⚠️ Chưa có nội dung lý thuyết để xuất PDF. Vui lòng nhập ít nhất 1 mục nội dung."); return; }
+
+            document.getElementById("pdf-lt-khoa").innerText = document.getElementById("in-khoa-lt").value;
+            document.getElementById("pdf-lt-ma").innerText = maHoSoHienTai || 'LT-' + new Date().getTime().toString().slice(-6);
+            document.getElementById("pdf-lt-chude").innerText = tenBenh;
+            document.getElementById("pdf-lt-nguoitb").innerText = document.getElementById("in-nguoi-trinh-bay-lt").value;
+            document.getElementById("pdf-lt-bacsiky").innerText = document.getElementById("in-nguoi-trinh-bay-lt").value;
+
+            let html = '';
+            dsLyThuyet.forEach(item => {
+                html += `<div class="pdf-section avoid-break" style="margin-top: 16px;">
+                    <strong style="color:#0284c7; font-size:16px;">${escapeHtml(item.tieuDe)}</strong><br>
+                    <span class="pdf-text-block">${escapeHtml(item.noiDung).replace(/\n/g, '<br>')}</span>
+                </div>`;
+            });
+            document.getElementById("pdf-lt-content").innerHTML = html;
+
+            thucHienExportPDF('pdf-template-lt', `LyThuyet_${removeAccents(tenBenh.substring(0,30))}_${getTodayStr()}.pdf`);
+        }
+
         // HÀM LÀM MỊN GIAO DIỆN VÀ XOÁ LỖI TRẮNG FILE TRÊN CLIENT
         function thucHienExportPDF(templateId, fileName) {
             // Bước 1: Hiện màng bảo vệ Loader
@@ -1441,6 +1769,7 @@
             container.style.display = "block"; 
             document.getElementById('pdf-template-ba').style.display = (templateId === 'pdf-template-ba') ? 'block' : 'none';
             document.getElementById('pdf-template-dt').style.display = (templateId === 'pdf-template-dt') ? 'block' : 'none';
+            document.getElementById('pdf-template-lt').style.display = (templateId === 'pdf-template-lt') ? 'block' : 'none';
 
             let opt = {
                 margin:       [15, 15, 15, 15], // Căn lề trên, trái, dưới, phải (mm)

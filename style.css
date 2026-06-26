@@ -1,354 +1,199 @@
-<style>
-    /* =========================================
-       1. THIẾT LẬP MÀU SẮC & CƠ BẢN
-    ========================================= */
-    :root {
-        --primary-color: #0284c7; /* Xanh y tế */
-        --bg-color: #e0f2fe; /* Nền xanh nhạt */
-        --card-bg: #ffffff;
-        --text-color: #334155;
-    }
+/* =========================================
+           1. THIẾT LẬP CƠ BẢN & MÀU SẮC
+        ========================================= */
+        :root { --primary-color: #0284c7; --success-color: #16a34a; --warning-color: #f59e0b; --bg-color: #e0f2fe; --card-bg: #ffffff; --text-color: #334155; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        margin: 0;
-        padding: 20px;
-    }
+        /* =========================================
+           2. ĐĂNG NHẬP & CHỌN CHỨC NĂNG
+        ========================================= */
+        .auth-container { display: flex; justify-content: center; align-items: center; height: 100vh; background-image: url('logott.png'); background-position: center; background-size: 30%; background-repeat: no-repeat; background-blend-mode: overlay; background-color: rgba(224, 242, 254, 0.95); position: fixed; top: 0; left: 0; width: 100vw; z-index: 500; }
+        .auth-box { background: white; padding: 40px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--primary-color); }
+        
+        .chuc-nang-container { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .grid-chuc-nang { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px; width: 100%; }
+        
+        .chuc-nang-card { background: white; border-radius: 20px; padding: 45px 18px; text-align: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 3px solid transparent; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 190px; }
+        .chuc-nang-card:hover { transform: translateY(-10px); border-color: var(--primary-color); box-shadow: 0 15px 35px rgba(2, 132, 199, 0.2); }
+        .chuc-nang-icon { font-size: 85px; margin-bottom: 25px; transition: transform 0.3s ease; }
+        .chuc-nang-card:hover .chuc-nang-icon { transform: scale(1.15); } 
+        .chuc-nang-card h3 { color: var(--text-color); margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;}
 
-    /* =========================================
-       2. MÀN HÌNH NHẬP LIỆU (FORM)
-    ========================================= */
-    #khu-vuc-nhap-lieu {
-        max-width: 850px;
-        margin: 0 auto;
-    }
+        /* =========================================
+           3. FORM NHẬP LIỆU CHUNG
+        ========================================= */
+        .khu-vuc-nhap { max-width: 950px; margin: 0 auto; display: none; margin-top: 30px; }
+        h2 { text-align: center; color: var(--primary-color); font-size: 30px; margin-bottom: 5px; text-transform: uppercase; font-weight: 800; }
+        .subtitle-benh { text-align: center; font-size: 22px; font-weight: bold; color: #dc2626; margin-bottom: 25px; }
 
-    h2 {
-        text-align: center;
-        color: var(--primary-color);
-        font-size: 26px;
-        margin-bottom: 25px;
-        text-transform: uppercase;
-        font-weight: 700;
-    }
+        .form-section { background-color: var(--card-bg); padding: 25px; margin-bottom: 25px; border-radius: 10px; border-top: 4px solid var(--primary-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
+        .form-section h3 { margin-top: 0; color: var(--primary-color); border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; font-size: 22px; font-weight: 800;}
 
-    .form-section {
-        background-color: var(--card-bg);
-        padding: 25px;
-        margin-bottom: 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Hiệu ứng thẻ nổi */
-        border-top: 4px solid var(--primary-color);
-    }
+        .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px; width: 100%; }
+        .form-row .form-group { margin-bottom: 0; width: 100%; min-width: 0; } 
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 800; margin-bottom: 8px; color: #475569; font-size: 16px;}
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; font-size: 16px; background-color: #f8fafc; box-sizing: border-box; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); background-color: #fff; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); white-space: normal; }
+        .highlight-input { border: 2px solid #dc2626 !important; background-color: #fef2f2 !important; font-weight: bold;}
 
-    .form-section h3 {
-        margin-top: 0;
-        color: var(--primary-color);
-        border-bottom: 2px solid #f1f5f9;
-        padding-bottom: 10px;
-        font-size: 18px;
-    }
+        .dynamic-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; padding: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;}
+        .dynamic-row .form-group { margin-bottom: 0; }
+        
+        .btn-add-row { background-color: #f1f5f9; color: var(--primary-color); border: 1px dashed var(--primary-color); padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px;}
+        .btn-delete-row { background-color: #ef4444; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold;}
 
-    .form-group {
-        margin-bottom: 15px;
-    }
+        .button-group { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap;}
+        button.btn-main { padding: 14px 15px; font-size: 16px; font-weight: 800; border: none; border-radius: 8px; cursor: pointer; text-transform: uppercase; color: white; flex: 1; opacity: 1 !important; transition: all 0.2s;}
+        button.btn-main:hover { filter: brightness(0.9); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
+        .btn-success { background-color: var(--success-color); }
+        .btn-primary { background-color: var(--primary-color); }
+        .btn-warning { background-color: var(--warning-color); }
+        .btn-danger { background-color: #dc2626; }
+        .btn-pdf { background-color: #be123c; } /* Màu nút PDF */
 
-    .form-group label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: #475569;
-    }
+        /* =========================================
+           KHU VỰC PASTE ẢNH
+        ========================================= */
+        .paste-zone {
+            flex: 1; border: 2px dashed #0284c7; border-radius: 8px; padding: 20px; 
+            text-align: center; background: #f0f9ff; cursor: pointer; 
+            transition: all 0.2s; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; min-height: 120px;
+        }
+        .paste-zone:hover { background: #e0f2fe; border-color: #0369a1; }
+        .paste-zone:focus { outline: 2px solid var(--warning-color); background: #fefce8; border-color: var(--warning-color); }
+        .paste-icon { font-size: 30px; margin-bottom: 10px; }
+        .paste-text { color: #0284c7; font-weight: bold; font-size: 14px; }
+        .preview-img { max-width: 100%; max-height: 180px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 10px; display: none; }
 
-    .form-group input, 
-    .form-group textarea {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        font-family: inherit;
-        font-size: 15px;
-        background-color: #f8fafc;
-        box-sizing: border-box;
-        transition: border-color 0.3s;
-    }
+        /* =========================================
+           PHẦN LÝ THUYẾT
+        ========================================= */
+        .theory-help { background: #f0f9ff; border-left: 5px solid var(--primary-color); padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 15px; line-height: 1.5; color: #0f172a; }
+        .theory-help strong { color: var(--primary-color); }
+        .theory-section-title { display: flex; align-items: center; gap: 8px; color: var(--primary-color); font-weight: 900; margin: 0 0 10px 0; font-size: 18px; }
+        .row-lythuyet { flex-direction: column; }
+        .row-lythuyet .lt-title-input { font-weight: 800; color: var(--primary-color); }
+        .slide-theory-topic { color: #dc2626; text-transform: uppercase; font-weight: 900; }
+        .slide-theory-content p { margin: 0 0 18px 0; line-height: 1.45; }
+        .slide-theory-content .bullet-dot { color: var(--primary-color); font-weight: 900; margin-right: 12px; }
 
-    .form-group input:focus, 
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--primary-color);
-        background-color: #fff;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
-    }
+        /* =========================================
+           4. MODAL
+        ========================================= */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background-color: white; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .search-list { max-height: 300px; overflow-y: auto; margin-top: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 6px;}
+        .search-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px dashed #ccc; font-size: 16px; transition: background 0.2s;}
+        .search-item:hover { background-color: #f1f5f9; }
+        .search-item-info { flex: 1; cursor: pointer; }
+        .search-item-info strong { color: var(--primary-color); }
+        .btn-delete-ba { background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s;}
+        .btn-delete-ba:hover { background-color: #dc2626; color: white; }
 
-    .btn-primary {
-        background-color: var(--primary-color);
-        color: white;
-        width: 100%;
-        padding: 15px;
-        font-size: 18px;
-        font-weight: bold;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        text-transform: uppercase;
-        box-shadow: 0 4px 6px rgba(2, 132, 199, 0.3);
-        margin-bottom: 40px;
-    }
+        /* =========================================
+           5. KHU VỰC TRÌNH CHIẾU
+        ========================================= */
+        #khu-vuc-trinh-chieu { display: none; width: 100vw; height: 100vh; background-color: white; position: fixed; top: 0; left: 0; z-index: 1000; overflow: hidden; cursor: pointer;}
+        #khu-vuc-trinh-chieu::before { content: ""; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60vw; height: 60vh; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.05; z-index: 1; pointer-events: none; }
+        
+        .logo-corner { position: absolute; top: 20px; left: 30px; width: 90px; height: 90px; background-image: url('logott.png'); background-size: contain; background-repeat: no-repeat; z-index: 100; }
+        .presenter-box { position: absolute; top: 20px; right: 30px; display: flex; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 5px 15px; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid var(--primary-color); z-index: 100; animation: fadeInDown 0.8s ease-out forwards; }
+        .presenter-box img.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; border: 1px solid #e2e8f0; }
 
-    .btn-primary:hover {
-        background-color: #0369a1;
-    }
+        .slide { display: none; height: 100%; padding: 40px 80px; box-sizing: border-box; }
+        .slide.active { display: block; animation: slideInRight 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
+        
+        .slide-header { font-size: 55px; font-weight: 900; color: var(--primary-color); border-bottom: 4px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px; margin-left: 100px; margin-right: 250px; position: relative; z-index: 10; pointer-events: none; }
+        
+        .slide-content { font-size: 38px; line-height: 1.5; color: #1e293b; padding-left: 20px; position: relative; z-index: 10; pointer-events: auto; max-height: 65vh; overflow-y: auto; padding-right: 15px; }
+        .slide-content::-webkit-scrollbar { width: 8px; }
+        .slide-content::-webkit-scrollbar-track { background: transparent; }
+        .slide-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .slide-content::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+        .slide-content p strong { font-weight: 900; color: var(--primary-color); }
+        .text-indent, #out-cls-text { padding-left: 40px; margin-top: 10px; color: #334155; white-space: pre-wrap; }
+        
+        .slide-controls { position: absolute; bottom: 30px; right: 50px; display: flex; gap: 15px; z-index: 100; pointer-events: auto;}
+        .slide-controls button { width: auto; font-size: 20px; padding: 12px 30px; color: var(--text-color); background-color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 800;}
+        .slide-controls button:hover { background-color: #cbd5e1; }
 
-    /* =========================================
-       3. MÀN HÌNH TRÌNH CHIẾU & SLIDE
-    ========================================= */
-    #khu-vuc-trinh-chieu {
-        width: 100vw;
-        height: 100vh;
-        background-color: white;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-    }
+        table.tb-dienbien { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 28px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        table.tb-dienbien th, table.tb-dienbien td { border: 2px solid #cbd5e1; padding: 15px; vertical-align: top; line-height: 1.5; }
+        table.tb-dienbien th { background-color: var(--primary-color); color: white; text-align: center; font-size: 32px; font-weight: 900; text-transform: uppercase;}
+        table.tb-dienbien td:nth-child(1) { width: 15%; font-weight: bold; text-align: center; color: #dc2626;} 
+        table.tb-dienbien td:nth-child(2) { width: 45%; text-align: left; } 
+        table.tb-dienbien td:nth-child(3) { width: 40%; text-align: left; } 
 
-    /* NỀN CHÌM (WATERMARK) */
-    #khu-vuc-trinh-chieu::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60vw;
-        height: 60vh;
-        background-image: url('logott.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.05; /* Độ mờ của logo giữa màn hình */
-        z-index: 1;
-        pointer-events: none;
-    }
+        .slide-image-container { text-align: center; margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 72vh; overflow: hidden; cursor: grab; touch-action: none; }
+        .slide-image-container.dragging { cursor: grabbing; }
+        .slide-image-container img { max-height: 100%; max-width: 98%; border: 4px solid var(--primary-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); object-fit: contain; transform: translate(var(--image-pan-x, 0px), var(--image-pan-y, 0px)) scale(var(--image-zoom, 1)); transform-origin: center center; transition: transform 0.12s ease-in-out; user-select: none; pointer-events: none; }
+        .slide-image-container.dragging img { transition: none; }
+        .slide-content.image-slide-content { max-height: none; overflow: visible; padding-left: 0; padding-right: 0; height: calc(100vh - 175px) !important; }
+        .slide-image-note { margin-top: 15px; font-size: 34px; color: #dc2626; font-style: italic; font-weight: 900; }
+        .zoom-controls { display: none; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.92); border: 2px solid #cbd5e1; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .zoom-controls.show { display: flex; }
+        .slide-controls button.zoom-btn { padding: 10px 16px; min-width: 56px; font-size: 20px; }
+        .zoom-percent { min-width: 58px; text-align: center; font-size: 18px; font-weight: 900; color: var(--primary-color); user-select: none; }
 
-    /* LOGO GÓC TRÁI MÀN HÌNH */
-    .logo-corner {
-        position: absolute;
-        top: 30px;
-        left: 40px;
-        width: 100px;
-        height: 100px;
-        background-image: url('logott.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        z-index: 100;
-    }
+        /* =========================================
+           6. CSS RIÊNG CHO SLIDE CHÀO MỪNG
+        ========================================= */
+        .slide-welcome { text-align: center; height: 100%; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+        .slide.active.slide-welcome { display: flex; align-items: center; justify-content: center; }
+        .welcome-content { animation: zoomIn 0.8s ease-out forwards; position: relative; z-index: 10;}
+        .welcome-logo { width: 180px; margin-bottom: 20px; animation: heartbeat 2s infinite; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        .welcome-title { font-size: 65px; color: var(--primary-color); font-weight: 900; margin: 0 0 15px 0; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); display: inline-block; animation: chayQuaChayLai 3s ease-in-out infinite alternate; }
+        .welcome-subtitle { font-size: 45px; color: #dc2626; font-weight: 900; margin: 0 0 30px 0; text-transform: uppercase; padding: 0 20px;}
+        .welcome-divider { width: 150px; border: 4px solid var(--success-color); border-radius: 5px; margin: 0 auto 30px auto; }
+        .welcome-footer { font-size: 40px; color: var(--primary-color); font-weight: 800; margin: 0; letter-spacing: 2px; }
 
-    .slide {
-        display: none;
-        height: 100%;
-        padding: 50px 100px;
-        box-sizing: border-box;
-    }
+        @keyframes chayQuaChayLai { 0% { transform: translateX(-60px); } 100% { transform: translateX(60px); } }
+        @keyframes heartbeat { 0% { transform: scale(1); } 20% { transform: scale(1.1); } 40% { transform: scale(1); } 60% { transform: scale(1.05); } 80% { transform: scale(1); } 100% { transform: scale(1); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(80px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    .slide.active { display: block; }
+        .slide.active .slide-content > p, .slide.active .slide-content > div, .slide.active .slide-content > table { opacity: 0; animation: fadeInUp 0.5s ease-out forwards; }
+        .slide.active .slide-content > p:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .slide-content > p:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .slide-content > p:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .slide-content > p:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .slide-content > table { animation-delay: 0.3s; }
 
-    /* Đảm bảo chữ đè lên watermark */
-    .slide-header, .slide-content {
-        position: relative;
-        z-index: 10; 
-    }
-
-    .slide-header {
-        font-size: 38px;
-        color: var(--primary-color);
-        font-weight: bold;
-        border-bottom: 3px solid var(--primary-color);
-        padding-bottom: 15px;
-        margin-bottom: 30px;
-        margin-left: 120px; /* Thụt vào để chừa chỗ cho logo góc tránh bị đè chữ */
-    }
-
-    .slide-content {
-        font-size: 30px;
-        line-height: 1.6;
-        color: #1e293b;
-    }
-
-    .text-indent {
-        padding-left: 30px;
-        margin-top: 5px;
-        color: #334155;
-    }
-
-    /* =========================================
-       4. KHU VỰC HIỂN THỊ ẢNH & ĐIỀU KHIỂN
-    ========================================= */
-    .image-gallery {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin-top: 20px;
-        justify-content: center;
-        position: relative;
-        z-index: 10;
-    }
-
-    .image-gallery img {
-        max-height: 450px; /* Giới hạn chiều cao để không bị tràn slide */
-        max-width: 100%;
-        border: 3px solid #cbd5e1;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .slide-controls {
-        position: absolute;
-        bottom: 30px;
-        right: 50px;
-        display: flex;
-        gap: 15px;
-        z-index: 100;
-    }
-
-    .slide-controls button {
-        font-size: 18px;
-        padding: 10px 25px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        background-color: #e2e8f0;
-    }
-
-    .slide-controls button:hover { background-color: #cbd5e1; }
-    .slide-controls .btn-danger { background-color: #ef4444; color: white; }
-    .slide-controls .btn-danger:hover { background-color: #dc2626; }
-</style>
-/* --- CSS MÀN HÌNH ĐĂNG NHẬP --- */
-    .auth-container {
-        display: flex; justify-content: center; align-items: center; height: 100vh;
-        background-image: url('logott.png'); background-position: center; background-size: 30%; 
-        background-repeat: no-repeat; background-blend-mode: overlay; background-color: rgba(224, 242, 254, 0.95);
-        position: fixed; top: 0; left: 0; width: 100vw; z-index: 500;
-    }
-    .auth-box {
-        background: white; padding: 40px; border-radius: 12px; width: 400px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 5px solid var(--primary-color);
-    }
-    .btn-google {
-        background-color: white; color: #333; border: 1px solid #ccc; width: 100%;
-        padding: 12px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer;
-        display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .btn-google:hover { background-color: #f8fafc; }
-
-    /* --- CSS MÀN HÌNH CHỌN KHOA --- */
-    .khoa-container {
-        max-width: 900px; margin: 50px auto; padding: 20px;
-    }
-    .grid-khoa {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
-    }
-    .khoa-card {
-        background: white; border-radius: 12px; padding: 30px 20px; text-align: center;
-        cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid transparent;
-        transition: all 0.3s ease;
-    }
-    .khoa-card:hover {
-        transform: translateY(-5px); border-color: var(--primary-color);
-        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
-    }
-    .khoa-icon { font-size: 50px; margin-bottom: 15px; }
-    .khoa-card h3 { color: var(--text-color); margin: 0; font-size: 18px; }
-    /* =========================================
-       5. HIỆU ỨNG TRÌNH CHIẾU (ANIMATIONS)
-    ========================================= */
-    /* Hiệu ứng cho toàn bộ Slide khi xuất hiện */
-    .slide.active {
-        display: block;
-        animation: hienThiSlide 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-    }
-
-    @keyframes hienThiSlide {
-        0% { opacity: 0; transform: translateY(40px) scale(0.98); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    /* Hiệu ứng bay vào lần lượt cho Tiêu đề và Nội dung */
-    .slide.active .slide-header {
-        animation: bayTuTrenXuong 0.6s ease-out forwards;
-    }
-
-    .slide.active .slide-content p, 
-    .slide.active .image-gallery {
-        opacity: 0; /* Ẩn đi trước khi chạy hiệu ứng */
-        animation: bayTuDuoiLen 0.5s ease-out forwards;
-    }
-
-    /* Trễ nhịp (Stagger) để chữ hiện ra lần lượt từng dòng */
-    .slide.active .slide-content p:nth-child(1) { animation-delay: 0.1s; }
-    .slide.active .slide-content p:nth-child(2) { animation-delay: 0.2s; }
-    .slide.active .slide-content p:nth-child(3) { animation-delay: 0.3s; }
-    .slide.active .slide-content p:nth-child(4) { animation-delay: 0.4s; }
-    .slide.active .image-gallery { animation-delay: 0.5s; }
-
-    @keyframes bayTuTrenXuong {
-        0% { opacity: 0; transform: translateY(-30px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes bayTuDuoiLen {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-
-    /* =========================================
-       6. KHU VỰC AVATAR NGƯỜI TRÌNH BÀY
-    ========================================= */
-    .presenter-box {
-        position: absolute;
-        top: 30px;
-        right: 50px;
-        display: flex;
-        align-items: center;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 8px 20px;
-        border-radius: 50px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        border: 2px solid var(--primary-color);
-        z-index: 100;
-        animation: bayTuTrenXuong 0.8s ease-out forwards;
-    }
-
-    .presenter-box img.avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 12px;
-        border: 2px solid #e2e8f0;
-    }
-
-    .presenter-name {
-        line-height: 1.3;
-    }
-    /* =========================================
-           5. CSS DÀNH CHO XUẤT PDF (MẸO LAYER ẨN)
+        /* =========================================
+           7. CSS MẪU PDF (ẨN TRÊN MÀN HÌNH - XUẤT MỚI THẤY)
         ========================================= */
         #pdf-export-container { 
             display: none; 
             width: 210mm; 
-            /* Bỏ padding ở đây để thư viện tự động căn lề */
-            background: #ffffff; 
+            min-height: 297mm; 
+            padding: 15mm 20mm; 
+            background: white; 
             color: black; 
             font-family: 'Times New Roman', Times, serif; 
-            /* THAY ĐỔI QUAN TRỌNG: Dùng absolute thay vì fixed */
-            position: absolute; 
+            position: fixed; 
             top: 0; 
             left: 0; 
-            z-index: 100; 
+            z-index: 9990; 
             box-sizing: border-box; 
         }
+        .pdf-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .pdf-header-left { text-align: center; font-weight: bold; font-size: 14px; }
+        .pdf-header-right { text-align: center; font-weight: bold; font-size: 14px; }
+        .pdf-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; text-transform: uppercase; }
+        .pdf-section { margin-bottom: 15px; font-size: 15px; line-height: 1.5; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 8px; text-align: left; }
+        .pdf-table th { text-align: center; font-weight: bold; background-color: #f2f2f2; }
+        .avoid-break { page-break-inside: avoid; }
+        .pdf-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.04); font-weight: bold; z-index: 0; pointer-events: none; white-space: nowrap;}
+        .pdf-text-block { white-space: pre-wrap; word-break: break-word; display: inline-block; width: 100%; vertical-align: top;}
+
+        /* Hiệu ứng Màn hình Loading khi xuất file */
+        #pdf-loader { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #be123c; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
