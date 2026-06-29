@@ -12,7 +12,7 @@ const firebaseConfig = {
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let loaiFormHienTai = 'BA'; 
+        let loaiFormHienTai = 'LT'; 
         let slideHienTai = 0;
         let danhSachSlide = [];
         let trangThaiDaLuu = false; 
@@ -26,19 +26,38 @@ const firebaseConfig = {
         };
 
         const mucLyThuyetCoSan = [
-            { key: 'mucTieu', id: 'in-lt-muctieu', tieuDe: '🎯 I. MỤC TIÊU BÀI HỌC' },
-            { key: 'daiCuong', id: 'in-lt-daiduong', tieuDe: '📌 II. ĐẠI CƯƠNG / KHÁI NIỆM' },
-            { key: 'nguyenNhan', id: 'in-lt-nguyennhan', tieuDe: '🧬 III. NGUYÊN NHÂN / CƠ CHẾ / YẾU TỐ NGUY CƠ' },
-            { key: 'lamSang', id: 'in-lt-lamsang', tieuDe: '🩺 IV. TRIỆU CHỨNG LÂM SÀNG' },
-            { key: 'canLamSang', id: 'in-lt-canlamsang', tieuDe: '🔬 V. CẬN LÂM SÀNG / CHẨN ĐOÁN' },
-            { key: 'dieuTri', id: 'in-lt-dieutri', tieuDe: '💊 VI. ĐIỀU TRỊ / CHĂM SÓC / THEO DÕI' },
-            { key: 'phongBenh', id: 'in-lt-phongbenh', tieuDe: '🛡️ VII. PHÒNG BỆNH / GIÁO DỤC SỨC KHỎE' },
-            { key: 'banLuan', id: 'in-lt-banluan', tieuDe: '💡 VIII. GHI NHỚ / CÂU HỎI THẢO LUẬN' }
+            { key: 'canCu', id: 'in-lt-cancu', tieuDe: '📄 I. CĂN CỨ / TÀI LIỆU CHUYÊN MÔN' },
+            { key: 'mucTieu', id: 'in-lt-muctieu', tieuDe: '🎯 II. MỤC TIÊU BÀI HỌC' },
+            { key: 'daiCuong', id: 'in-lt-daiduong', tieuDe: '📌 III. ĐỊNH NGHĨA / ĐẠI CƯƠNG' },
+            { key: 'nguyenNhan', id: 'in-lt-nguyennhan', tieuDe: '🦠 IV. NGUYÊN NHÂN VÀ YẾU TỐ THUẬN LỢI' },
+            { key: 'coChe', id: 'in-lt-coche', tieuDe: '🧬 V. CƠ CHẾ BỆNH SINH / ĐƯỜNG LÂY NHIỄM' },
+            { key: 'lamSang', id: 'in-lt-lamsang', tieuDe: '🩺 VI. CHẨN ĐOÁN LÂM SÀNG' },
+            { key: 'canLamSang', id: 'in-lt-canlamsang', tieuDe: '🔬 VII. CẬN LÂM SÀNG / CHẨN ĐOÁN HÌNH ẢNH' },
+            { key: 'mucDoNang', id: 'in-lt-mucdonang', tieuDe: '📊 VIII. CHẨN ĐOÁN MỨC ĐỘ NẶNG / THANG ĐIỂM' },
+            { key: 'phanBiet', id: 'in-lt-phanbiet', tieuDe: '🔎 IX. CHẨN ĐOÁN PHÂN BIỆT' },
+            { key: 'bienChung', id: 'in-lt-bienchung', tieuDe: '⚠️ X. CHẨN ĐOÁN BIẾN CHỨNG' },
+            { key: 'dieuTri', id: 'in-lt-dieutri', tieuDe: '💊 XI. ĐIỀU TRỊ / CHĂM SÓC / THEO DÕI' },
+            { key: 'phongBenh', id: 'in-lt-phongbenh', tieuDe: '🛡️ XII. DỰ PHÒNG / GIÁO DỤC SỨC KHỎE' },
+            { key: 'banLuan', id: 'in-lt-banluan', tieuDe: '💡 XIII. GHI NHỚ / CÂU HỎI THẢO LUẬN' }
         ];
+        mucLyThuyetCoSan.forEach(muc => { muc.tieuDeMacDinh = muc.tieuDe; });
 
         function layCauHinhLoai(loai = loaiFormHienTai) { return cauHinhLoaiForm[loai] || cauHinhLoaiForm.BA; }
         function layGiaTri(id) { return (document.getElementById(id)?.value || '').trim(); }
         function ganGiaTri(id, val) { const el = document.getElementById(id); if(el) el.value = val || ''; }
+        function layMaHoSoDangMo() {
+            const cfg = layCauHinhLoai();
+            const form = document.getElementById(cfg.formId);
+            return maHoSoHienTai || form?.dataset?.maHoSo || sessionStorage.getItem('maHoSoDangMo_' + loaiFormHienTai) || "";
+        }
+        function ganMaHoSoDangMo(ma) {
+            maHoSoHienTai = ma || "";
+            const cfg = layCauHinhLoai();
+            const form = document.getElementById(cfg.formId);
+            if(form) form.dataset.maHoSo = maHoSoHienTai;
+            if(maHoSoHienTai) sessionStorage.setItem('maHoSoDangMo_' + loaiFormHienTai, maHoSoHienTai);
+            else sessionStorage.removeItem('maHoSoDangMo_' + loaiFormHienTai);
+        }
         function escapeHtml(text) {
             return String(text || '').replace(/[&<>"']/g, function(ch) {
                 return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
@@ -79,11 +98,12 @@ const firebaseConfig = {
         function vaoFormNhapLieu(loai) {
             document.getElementById("khu-vuc-chon-chuc-nang").style.display = "none";
             loaiFormHienTai = loai;
-            maHoSoHienTai = ""; 
+            ganMaHoSoDangMo(""); 
             trangThaiDaLuu = false;
             anTatCaFormNhapLieu();
             const cfg = layCauHinhLoai(loai);
             document.getElementById(cfg.formId).style.display = "block";
+            if(loai === 'LT') capNhatNhanTieuDeLyThuyet();
             capNhatTieuDeBenh();
         }
         
@@ -100,7 +120,7 @@ const firebaseConfig = {
                 img.src = event.target.result;
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200; const MAX_HEIGHT = 1200;
+                    const MAX_WIDTH = 1100; const MAX_HEIGHT = 1100;
                     let width = img.width; let height = img.height;
 
                     if (width > height) {
@@ -111,7 +131,7 @@ const firebaseConfig = {
                     canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
                     callback(dataUrl);
                 }
             }
@@ -189,6 +209,55 @@ const firebaseConfig = {
             document.getElementById("danh-sach-dien-bien-ba").appendChild(div);
         }
 
+
+        function layMucLyThuyetTheoKey(key) {
+            return mucLyThuyetCoSan.find(muc => muc.key === key);
+        }
+
+        function capNhatNhanTieuDeLyThuyet() {
+            mucLyThuyetCoSan.forEach(muc => {
+                const textarea = document.getElementById(muc.id);
+                if(!textarea) return;
+
+                const nhom = textarea.closest('.form-group');
+                if(!nhom) return;
+
+                let label = nhom.querySelector('label.theory-section-title');
+                if(!label) return;
+
+                label.innerHTML = `
+                    <span class="theory-title-text"></span>
+                    <button type="button" class="btn-edit-theory-title" title="Sửa tiêu đề mục này" onclick="suaTieuDeMucLyThuyet('${muc.key}', event)">✏️</button>
+                `;
+
+                const span = label.querySelector('.theory-title-text');
+                if(span) span.textContent = muc.tieuDe || muc.tieuDeMacDinh || '';
+            });
+        }
+
+        function suaTieuDeMucLyThuyet(key, event) {
+            if(event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const muc = layMucLyThuyetTheoKey(key);
+            if(!muc) return;
+
+            const tieuDeMoi = prompt('Nhập tiêu đề mới cho mục này:', muc.tieuDe || muc.tieuDeMacDinh || '');
+            if(tieuDeMoi === null) return;
+
+            const tieuDeDaSua = tieuDeMoi.trim();
+            if(!tieuDeDaSua) {
+                alert('Tiêu đề không được để trống.');
+                return;
+            }
+
+            muc.tieuDe = tieuDeDaSua;
+            capNhatNhanTieuDeLyThuyet();
+            trangThaiDaLuu = false;
+        }
+
         function themDongMucLyThuyet(savedTieuDe = "", savedNoiDung = "") {
             let div = document.createElement("div");
             div.className = "dynamic-row row-lythuyet";
@@ -208,7 +277,13 @@ const firebaseConfig = {
 
         function thuThapDuLieuLyThuyet() {
             let noiDungLyThuyet = {};
-            mucLyThuyetCoSan.forEach(muc => { noiDungLyThuyet[muc.key] = layGiaTri(muc.id); });
+            noiDungLyThuyet.tieuDeMuc = {};
+
+            mucLyThuyetCoSan.forEach(muc => {
+                noiDungLyThuyet[muc.key] = layGiaTri(muc.id);
+                noiDungLyThuyet.tieuDeMuc[muc.key] = muc.tieuDe || muc.tieuDeMacDinh || '';
+            });
+
             noiDungLyThuyet.mucBoSung = [];
             document.querySelectorAll("#danh-sach-muc-lt .row-lythuyet").forEach(row => {
                 let tieuDe = row.querySelector('.lt-title-input')?.value.trim() || '';
@@ -219,9 +294,17 @@ const firebaseConfig = {
         }
 
         function napDuLieuLyThuyet(duLieu) {
-            mucLyThuyetCoSan.forEach(muc => { ganGiaTri(muc.id, duLieu?.noiDungLyThuyet?.[muc.key] || duLieu?.[muc.key] || ''); });
+            const noiDung = duLieu?.noiDungLyThuyet || duLieu || {};
+            const tieuDeDaLuu = noiDung?.tieuDeMuc || duLieu?.tieuDeMuc || noiDung?.tieuDeCacMuc || duLieu?.tieuDeCacMuc || {};
+
+            mucLyThuyetCoSan.forEach(muc => {
+                muc.tieuDe = tieuDeDaLuu[muc.key] || muc.tieuDeMacDinh || muc.tieuDe;
+                ganGiaTri(muc.id, noiDung?.[muc.key] || '');
+            });
+            capNhatNhanTieuDeLyThuyet();
+
             document.getElementById("danh-sach-muc-lt").innerHTML = "";
-            let dsBoSung = duLieu?.noiDungLyThuyet?.mucBoSung || duLieu?.mucBoSung || [];
+            let dsBoSung = noiDung?.mucBoSung || duLieu?.mucBoSung || [];
             dsBoSung.forEach(item => themDongMucLyThuyet(item.tieuDe || '', item.noiDung || ''));
         }
 
@@ -264,9 +347,11 @@ const firebaseConfig = {
             if(!tenBenh) { alert(loaiFormHienTai === 'LT' ? "Vui lòng nhập Chủ đề / Tên bài lý thuyết!" : "Vui lòng nhập Tên bệnh/Chẩn đoán!"); return; }
             if(!matKhau) { alert("🔒 Vui lòng đặt MẬT KHẨU BẢO VỆ để tránh người khác xóa nhầm!"); return; }
 
-            if(!maHoSoHienTai) {
-                maHoSoHienTai = cfg.maPrefix + new Date().getTime().toString().slice(-6);
+            let maDangMo = layMaHoSoDangMo();
+            if(!maDangMo) {
+                maDangMo = cfg.maPrefix + new Date().getTime().toString().slice(-6);
             }
+            ganMaHoSoDangMo(maDangMo);
 
             let arrAnh = [];
             if(loaiFormHienTai === 'BA' || loaiFormHienTai === 'DT') {
@@ -281,7 +366,7 @@ const firebaseConfig = {
             let duLieu = {
                 id: maHoSoHienTai, khoa: khoa, matKhau: matKhau, tenBenh: tenBenh,
                 nguoiTrinhBay: nguoiTrinhBay, danhSachAnh: arrAnh,
-                loaiForm: loaiFormHienTai, ngayTao: new Date().toLocaleString('vi-VN')
+                loaiForm: loaiFormHienTai, ngayTao: new Date().toLocaleString('vi-VN'), ngayCapNhat: new Date().toLocaleString('vi-VN')
             };
 
             if (loaiFormHienTai === 'BA') {
@@ -334,16 +419,16 @@ const firebaseConfig = {
             db.ref(cfg.path).get().then((snapshot) => {
                 if (snapshot.exists()) {
                     let data = snapshot.val();
-                    duLieuTamThoi = Object.values(data).filter(item => item && item.id);
+                    duLieuTamThoi = Object.entries(data).map(([key, item]) => ({ ...(item || {}), id: (item && item.id) ? item.id : key, _firebaseKey: key })).filter(item => item && item.id);
                     let h = "";
                     duLieuTamThoi.reverse().forEach(ba => {
                         h += `
                         <div class="search-item">
-                            <div class="search-item-info" onclick="taiDuLieu('${ba.id}')">
+                            <div class="search-item-info" onclick="taiDuLieu('${ba._firebaseKey || ba.id}')">
                                 <strong>${escapeHtml(ba.id)}</strong> - ${escapeHtml(ba.tenBenh || '')} <br>
                                 <span style="font-size: 14px; color: #64748b;">${escapeHtml(ba.khoa || '')} | Người trình bày: ${escapeHtml(ba.nguoiTrinhBay || '')} | Lưu lúc: ${escapeHtml(ba.ngayTao || '')}</span>
                             </div>
-                            <button class="btn-delete-ba" onclick="xoaBenhAn('${ba.id}', event)">🗑️ Xóa</button>
+                            <button class="btn-delete-ba" onclick="xoaBenhAn('${ba._firebaseKey || ba.id}', event)">🗑️ Xóa</button>
                         </div>`;
                     });
                     document.getElementById("danh-sach-kq").innerHTML = h;
@@ -358,7 +443,7 @@ const firebaseConfig = {
         function xoaBenhAn(id, event) {
             event.stopPropagation(); 
             const cfg = layCauHinhLoai();
-            let ba = duLieuTamThoi.find(x => x.id === id);
+            let ba = duLieuTamThoi.find(x => x.id === id || x._firebaseKey === id);
             if(!ba) return;
 
             if(ba.matKhau) {
@@ -373,7 +458,7 @@ Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:
                 db.ref(cfg.path + '/' + id).remove()
                     .then(() => {
                         alert("Đã xóa hồ sơ thành công!");
-                        if(maHoSoHienTai === id) maHoSoHienTai = "";
+                        if(maHoSoHienTai === id) ganMaHoSoDangMo("");
                         moModalTimKiem(); 
                     })
                     .catch((error) => { alert("Lỗi xóa dữ liệu: " + error.message); });
@@ -384,10 +469,10 @@ Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:
         // PHỤC HỒI LẠI DỮ LIỆU TỪ MÁY CHỦ
         // ==========================================
         function taiDuLieu(id) {
-            let ba = duLieuTamThoi.find(x => x.id === id);
+            let ba = duLieuTamThoi.find(x => x.id === id || x._firebaseKey === id);
             if(ba) {
                 const cfg = layCauHinhLoai();
-                maHoSoHienTai = ba.id;
+                ganMaHoSoDangMo(ba._firebaseKey || ba.id);
                 let s = cfg.suffix;
                 
                 document.getElementById("in-khoa" + s).value = ba.khoa || "";
@@ -902,11 +987,148 @@ Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:
             return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').replace(/\s+/g, '_');
         }
 
-        function xuatPDFBenhAn() {
-            let tenBenh = document.getElementById("in-ten-benh-ba").value.trim();
-            if(!tenBenh) { alert("Vui lòng nhập Tên bệnh / Chẩn đoán để kết xuất PDF!"); return; }
+        function chonXuatPDF() {
+            if(loaiFormHienTai === 'DT') {
+                alert("Chức năng xuất PDF Bình đơn thuốc đã tắt. Ông vẫn có thể lưu, tìm kiếm và trình chiếu đơn thuốc bình thường.");
+                return;
+            }
 
-            // Đổ dữ liệu từ Form nhập liệu sang File mẫu A4 ẩn
+            const xuatTongHop = confirm(
+                "Chọn cách xuất PDF:\n\n" +
+                "OK: Xuất chung Lý thuyết + Bình bệnh án trong 1 file PDF.\n" +
+                "Hủy: Chỉ xuất PDF trang đang xem."
+            );
+
+            if(xuatTongHop) {
+                xuatPDFTongHop();
+                return;
+            }
+
+            if(loaiFormHienTai === 'BA') xuatPDFBenhAn();
+            else if(loaiFormHienTai === 'LT') xuatPDFLyThuyet();
+        }
+
+        function coDuLieuTrongInput(ids) {
+            return ids.some(id => {
+                const el = document.getElementById(id);
+                return el && String(el.value || '').trim() !== '';
+            });
+        }
+
+        function coAnhTrongDanhSach(selector) {
+            return Array.from(document.querySelectorAll(selector + ' .row-anh')).some(row => {
+                const b64 = row.querySelector('.base64-data')?.value || '';
+                const ghiChu = row.querySelector('.txt-ghichu')?.value || '';
+                return b64.trim() || ghiChu.trim();
+            });
+        }
+
+        function coDienBienBenhAn() {
+            return Array.from(document.querySelectorAll('#danh-sach-dien-bien-ba .row-dienbien')).some(row => {
+                return (row.querySelector('.db-thoigian')?.value || '').trim()
+                    || (row.querySelector('.db-dienbien')?.value || '').trim()
+                    || (row.querySelector('.db-xutri')?.value || '').trim();
+            });
+        }
+
+        function coDuLieuBenhAn() {
+            return coDuLieuTrongInput([
+                'in-ten-benh-ba','in-ten-ba','in-tuoi-ba','in-nghe-ba','in-diachi-ba','in-lydo-ba',
+                'in-benhsu-ba','in-tiensu-ba','in-khamchung-ba','in-cls-text-ba','in-tomtat-ba',
+                'in-chandoan-ba','in-banluan-ba'
+            ]) || coAnhTrongDanhSach('#danh-sach-anh-ba') || coDienBienBenhAn();
+        }
+
+        function coDuLieuDonThuoc() {
+            return coDuLieuTrongInput(['in-ten-benh-dt','in-nguoi-trinh-bay-dt']) || coAnhTrongDanhSach('#danh-sach-anh-dt');
+        }
+
+        function coDuLieuLyThuyet() {
+            const tenBenh = document.getElementById('in-ten-benh-lt')?.value?.trim();
+            const noiDung = layDanhSachLyThuyetDeChieu ? layDanhSachLyThuyetDeChieu() : [];
+            return !!tenBenh || noiDung.length > 0;
+        }
+
+        function layTenFileAnToan(prefix, ten) {
+            return `${prefix}_${removeAccents((ten || prefix).substring(0, 30))}_${getTodayStr()}.pdf`;
+        }
+
+        function themDongNoiDungPdf(parent, label, value, colorRed = false) {
+            const div = document.createElement('div');
+            div.className = 'pdf-line-row';
+            div.style.marginBottom = '4px';
+            div.style.maxWidth = '100%';
+            div.style.overflowWrap = 'anywhere';
+            div.style.wordBreak = 'break-word';
+            const safeLabel = escapeHtml(label);
+            const safeValue = escapeHtml(value || '');
+            div.innerHTML = `<strong>${safeLabel}</strong> <span class="pdf-text-block" style="${colorRed ? 'color:red;font-weight:bold;' : ''}">${safeValue.replace(/\n/g, '<br>')}</span>`;
+            parent.appendChild(div);
+        }
+
+        function nenAnhBase64ChoPDF(src, maxCanh = 1100, quality = 0.72) {
+            return new Promise(resolve => {
+                if(!src || !src.startsWith('data:image')) return resolve(src || '');
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        let w = img.naturalWidth || img.width;
+                        let h = img.naturalHeight || img.height;
+                        if(!w || !h) return resolve(src);
+
+                        // Ảnh càng nặng thì ép càng mạnh để html2canvas không vỡ khi xuất PDF.
+                        let gioiHanCanh = maxCanh;
+                        let chatLuong = quality;
+                        if(src.length > 2500000) { gioiHanCanh = Math.min(gioiHanCanh, 850); chatLuong = Math.min(chatLuong, 0.62); }
+                        else if(src.length > 1500000) { gioiHanCanh = Math.min(gioiHanCanh, 950); chatLuong = Math.min(chatLuong, 0.68); }
+
+                        const tyLe = Math.min(1, gioiHanCanh / Math.max(w, h));
+                        w = Math.max(1, Math.round(w * tyLe));
+                        h = Math.max(1, Math.round(h * tyLe));
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d', { willReadFrequently: false });
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, w, h);
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', chatLuong));
+                    } catch(e) {
+                        console.warn('Không nén được ảnh PDF, thử dùng ảnh gốc:', e);
+                        resolve(src);
+                    }
+                };
+                img.onerror = () => resolve(src);
+                img.src = src;
+            });
+        }
+
+        async function taoHtmlAnhPDF(selector, loai) {
+            const rows = Array.from(document.querySelectorAll(selector + ' .row-anh'));
+            let html = '';
+            for(const row of rows) {
+                const b64Goc = row.querySelector('.base64-data')?.value || '';
+                const ghiChu = row.querySelector('.txt-ghichu')?.value || '';
+                if(!b64Goc) continue;
+                const b64 = await nenAnhBase64ChoPDF(b64Goc, loai === 'DT' ? 900 : 1050, loai === 'DT' ? 0.64 : 0.72);
+                const label = loai === 'DT' ? 'Ghi chú đơn thuốc' : 'Hình ảnh đính kèm';
+                const border = loai === 'DT' ? '1px dashed #0284c7' : '1px solid #333';
+                html += `<div class="pdf-image-block" style="margin:8px 0 10px 0; text-align:center; max-width:100%; overflow:hidden; box-sizing:border-box; page-break-inside:auto; break-inside:auto;">
+                    <img src="${b64}" style="display:block; margin:0 auto; max-width:94%; max-height:${loai === 'DT' ? '165mm' : '150mm'}; height:auto; border:${border}; padding:3px; object-fit:contain; box-sizing:border-box;">
+                    ${ghiChu ? `<i style="color:#dc2626; font-size:12.5px; font-weight:bold; margin-top:5px; display:block; overflow-wrap:anywhere;">${label}: ${escapeHtml(ghiChu)}</i>` : ''}
+                </div>`;
+            }
+            return html;
+        }
+
+        async function chuanBiPDFBenhAn(opts = {}) {
+            const batBuoc = opts.batBuoc !== false;
+            let tenBenh = document.getElementById("in-ten-benh-ba").value.trim();
+            if(batBuoc && !tenBenh) { alert("Vui lòng nhập Tên bệnh / Chẩn đoán để kết xuất PDF!"); return false; }
+            if(!batBuoc && !coDuLieuBenhAn()) return false;
+            tenBenh = tenBenh || 'Chưa nhập tên bệnh';
+
             document.getElementById("pdf-ba-khoa").innerText = document.getElementById("in-khoa-ba").value;
             document.getElementById("pdf-ba-ma").innerText = maHoSoHienTai || 'BA-' + new Date().getTime().toString().slice(-6);
             document.getElementById("pdf-ba-ten").innerText = document.getElementById("in-ten-ba").value || "..................";
@@ -923,63 +1145,52 @@ Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:
             document.getElementById("pdf-ba-banluan").innerText = document.getElementById("in-banluan-ba").value;
             document.getElementById("pdf-ba-bacsiky").innerText = document.getElementById("in-nguoi-trinh-bay-ba").value;
 
-            // Xử lý nạp bảng diễn biến xử trí vào mẫu in
             let tbodyDienBien = document.getElementById("pdf-ba-dienbien-tbody");
-            tbodyDienBien.innerHTML = ''; let hasDienBien = false;
+            tbodyDienBien.innerHTML = ''; 
+            let hasDienBien = false;
             document.querySelectorAll("#danh-sach-dien-bien-ba .row-dienbien").forEach(row => {
                 let tg = row.querySelector('.db-thoigian').value;
                 let db = row.querySelector('.db-dienbien').value;
                 let xt = row.querySelector('.db-xutri').value;
                 if(tg || db || xt) {
                     hasDienBien = true;
-                    tbodyDienBien.innerHTML += `<tr class="avoid-break"><td>${tg}</td><td>${db.replace(/\n/g, '<br>')}</td><td>${xt.replace(/\n/g, '<br>')}</td></tr>`;
+                    tbodyDienBien.innerHTML += `<tr><td>${escapeHtml(tg).replace(/\n/g, '<br>')}</td><td>${escapeHtml(db).replace(/\n/g, '<br>')}</td><td>${escapeHtml(xt).replace(/\n/g, '<br>')}</td></tr>`;
                 }
             });
             document.getElementById('pdf-ba-dienbien-container').style.display = hasDienBien ? 'block' : 'none';
 
-            // Xử lý nạp ảnh cận lâm sàng đã dán
-            let imgContainer = document.getElementById("pdf-ba-images"); imgContainer.innerHTML = "";
-            document.querySelectorAll('#danh-sach-anh-ba .row-anh').forEach(row => {
-                let b64 = row.querySelector('.base64-data').value; let ghiChu = row.querySelector('.txt-ghichu').value;
-                if (b64) {
-                    imgContainer.innerHTML += `<div style="page-break-inside:avoid; margin-top:15px; text-align:center;"><img src="${b64}" style="max-width:95%; max-height:480px; border:1px solid #333; padding:2px;"><br><i style="color:#dc2626; font-size:14px; font-weight:bold; margin-top:5px; display:block;">Hình ảnh đính kèm: ${ghiChu}</i></div>`;
-                }
-            });
-
-            thucHienExportPDF('pdf-template-ba', `BenhAn_${removeAccents(document.getElementById("in-ten-ba").value || "BenhNhan")}_${getTodayStr()}.pdf`);
+            document.getElementById("pdf-ba-images").innerHTML = await taoHtmlAnhPDF('#danh-sach-anh-ba', 'BA');
+            return true;
         }
 
-        function xuatPDFDonThuoc() {
+        async function chuanBiPDFDonThuoc(opts = {}) {
+            const batBuoc = opts.batBuoc !== false;
             let tenBenh = document.getElementById("in-ten-benh-dt").value.trim();
-            if(!tenBenh) { alert("Vui lòng nhập thông tin Đơn thuốc để kết xuất PDF!"); return; }
+            if(batBuoc && !tenBenh) { alert("Vui lòng nhập thông tin Đơn thuốc để kết xuất PDF!"); return false; }
+            if(!batBuoc && !coDuLieuDonThuoc()) return false;
+            tenBenh = tenBenh || 'Chưa nhập nội dung đơn thuốc';
 
             document.getElementById("pdf-dt-khoa").innerText = document.getElementById("in-khoa-dt").value;
             document.getElementById("pdf-dt-ma").innerText = maHoSoHienTai || 'DT-' + new Date().getTime().toString().slice(-6);
             document.getElementById("pdf-dt-chandoan").innerText = tenBenh;
             document.getElementById("pdf-dt-bacsiky").innerText = document.getElementById("in-nguoi-trinh-bay-dt").value;
 
-            // Xử lý nạp ảnh đơn thuốc đã dán vào mẫu in
-            let imgContainer = document.getElementById("pdf-dt-images"); imgContainer.innerHTML = ""; let hasImage = false;
-            document.querySelectorAll('#danh-sach-anh-dt .row-anh').forEach(row => {
-                let b64 = row.querySelector('.base64-data').value; let ghiChu = row.querySelector('.txt-ghichu').value;
-                if (b64) {
-                    hasImage = true;
-                    imgContainer.innerHTML += `<div style="page-break-inside:avoid; margin-top:15px; text-align:center;"><img src="${b64}" style="max-width:95%; border:1px dashed #0284c7; padding:4px;"><br><i style="color:#dc2626; font-size:14px; font-weight:bold; margin-top:5px; display:block;">Ghi chú đơn thuốc: ${ghiChu}</i></div>`;
-                }
-            });
-            
-            if(!hasImage) { 
-                if(!confirm("Đơn thuốc chưa có hình ảnh nào. Vẫn tiếp tục xuất PDF rỗng?")) return; 
+            const htmlAnh = await taoHtmlAnhPDF('#danh-sach-anh-dt', 'DT');
+            document.getElementById("pdf-dt-images").innerHTML = htmlAnh;
+            if(batBuoc && !htmlAnh) {
+                if(!confirm("Đơn thuốc chưa có hình ảnh nào. Vẫn tiếp tục xuất PDF rỗng?")) return false;
             }
-
-            thucHienExportPDF('pdf-template-dt', `DonThuoc_${removeAccents(tenBenh.substring(0,20))}_${getTodayStr()}.pdf`);
+            return true;
         }
 
-        function xuatPDFLyThuyet() {
+        async function chuanBiPDFLyThuyet(opts = {}) {
+            const batBuoc = opts.batBuoc !== false;
             let tenBenh = document.getElementById("in-ten-benh-lt").value.trim();
-            if(!tenBenh) { alert("Vui lòng nhập Chủ đề / Tên bài lý thuyết để kết xuất PDF!"); return; }
             let dsLyThuyet = layDanhSachLyThuyetDeChieu();
-            if(dsLyThuyet.length === 0) { alert("⚠️ Chưa có nội dung lý thuyết để xuất PDF. Vui lòng nhập ít nhất 1 mục nội dung."); return; }
+            if(batBuoc && !tenBenh) { alert("Vui lòng nhập Chủ đề / Tên bài lý thuyết để kết xuất PDF!"); return false; }
+            if(batBuoc && dsLyThuyet.length === 0) { alert("⚠️ Chưa có nội dung lý thuyết để xuất PDF. Vui lòng nhập ít nhất 1 mục nội dung."); return false; }
+            if(!batBuoc && !coDuLieuLyThuyet()) return false;
+            tenBenh = tenBenh || 'Chưa nhập chủ đề lý thuyết';
 
             document.getElementById("pdf-lt-khoa").innerText = document.getElementById("in-khoa-lt").value;
             document.getElementById("pdf-lt-ma").innerText = maHoSoHienTai || 'LT-' + new Date().getTime().toString().slice(-6);
@@ -989,60 +1200,212 @@ Vui lòng NHẬP MẬT KHẨU để thực hiện quyền Xóa trên máy chủ:
 
             let html = '';
             dsLyThuyet.forEach(item => {
-                html += `<div class="pdf-section avoid-break" style="margin-top: 16px;">
-                    <strong style="color:#0284c7; font-size:16px;">${escapeHtml(item.tieuDe)}</strong><br>
+                html += `<div class="pdf-section avoid-break" style="margin-top: 13px;">
+                    <strong style="color:#0284c7; font-size:15px;">${escapeHtml(item.tieuDe)}</strong><br>
                     <span class="pdf-text-block">${escapeHtml(item.noiDung).replace(/\n/g, '<br>')}</span>
                 </div>`;
             });
             document.getElementById("pdf-lt-content").innerHTML = html;
-
-            thucHienExportPDF('pdf-template-lt', `LyThuyet_${removeAccents(tenBenh.substring(0,30))}_${getTodayStr()}.pdf`);
+            return true;
         }
 
-        // HÀM LÀM MỊN GIAO DIỆN VÀ XOÁ LỖI TRẮNG FILE TRÊN CLIENT
-        function thucHienExportPDF(templateId, fileName) {
-            // Bước 1: Hiện màng bảo vệ Loader
-            document.getElementById("pdf-loader").style.display = "flex"; 
-            
-            let container = document.getElementById("pdf-export-container");
-            let template = document.getElementById(templateId);
+        async function xuatPDFBenhAn() {
+            if(await chuanBiPDFBenhAn({ batBuoc: true })) {
+                await thucHienExportPDF('pdf-template-ba', `BenhAn_${removeAccents(document.getElementById("in-ten-ba").value || "BenhNhan")}_${getTodayStr()}.pdf`);
+            }
+        }
 
-            // QUAN TRỌNG NHẤT: Ép trình duyệt cuộn lên đỉnh trang để chống lỗi lệch tọa độ chụp của thẻ Canvas
+        async function xuatPDFDonThuoc() {
+            alert("Chức năng xuất PDF Bình đơn thuốc đã tắt để tránh lỗi khi ảnh đơn thuốc quá nặng. Các chức năng lưu, tìm kiếm và trình chiếu đơn thuốc vẫn giữ nguyên.");
+            return false;
+        }
+
+        async function xuatPDFLyThuyet() {
+            if(await chuanBiPDFLyThuyet({ batBuoc: true })) {
+                await thucHienExportPDF('pdf-template-lt', `LyThuyet_${removeAccents((document.getElementById("in-ten-benh-lt").value || 'LyThuyet').substring(0,30))}_${getTodayStr()}.pdf`);
+            }
+        }
+
+        async function xuatPDFTongHop() {
+            const daChuanBi = [];
+            if(await chuanBiPDFLyThuyet({ batBuoc: false })) daChuanBi.push('pdf-template-lt');
+            if(await chuanBiPDFBenhAn({ batBuoc: false })) daChuanBi.push('pdf-template-ba');
+            // Không xuất PDF Bình đơn thuốc theo yêu cầu. Đơn thuốc vẫn lưu/tìm kiếm/trình chiếu bình thường.
+
+            if(daChuanBi.length === 0) {
+                alert('⚠️ Chưa có dữ liệu để xuất PDF tổng hợp.');
+                return;
+            }
+
+            const container = document.getElementById('pdf-export-container');
+            const tongHop = document.createElement('div');
+            tongHop.id = 'pdf-template-tonghop';
+            tongHop.style.display = 'block';
+            tongHop.style.width = '165mm';
+            tongHop.style.maxWidth = '165mm';
+            tongHop.style.background = '#fff';
+            tongHop.style.boxSizing = 'border-box';
+            tongHop.style.overflow = 'visible';
+
+            daChuanBi.forEach((id, index) => {
+                const clone = document.getElementById(id).cloneNode(true);
+                clone.removeAttribute('id');
+                clone.style.display = 'block';
+                clone.style.width = '165mm';
+                clone.style.maxWidth = '165mm';
+                clone.style.margin = '0';
+                clone.style.padding = '0';
+                clone.style.boxSizing = 'border-box';
+                clone.style.overflow = 'visible';
+                clone.classList.add('pdf-combo-section');
+                if(index === daChuanBi.length - 1) clone.style.pageBreakAfter = 'auto';
+                tongHop.appendChild(clone);
+            });
+
+            container.appendChild(tongHop);
+            try {
+                await thucHienExportPDFElement(tongHop, `HoSoTongHop_${getTodayStr()}.pdf`, true);
+            } finally {
+                tongHop.remove();
+            }
+        }
+
+        function doiAnhPdfTaiXong(root) {
+            const imgs = Array.from(root.querySelectorAll('img'));
+            if(imgs.length === 0) return Promise.resolve();
+            return Promise.all(imgs.map(img => {
+                if(img.complete && img.naturalWidth > 0) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                    setTimeout(resolve, 3000);
+                });
+            }));
+        }
+
+        async function giamAnhTrongTemplateNeuCan(template) {
+            const imgs = Array.from(template.querySelectorAll('img'));
+            for(const img of imgs) {
+                const src = img.getAttribute('src') || '';
+                if(src.startsWith('data:image')) {
+                    img.src = await nenAnhBase64ChoPDF(src, 720, 0.56);
+                    img.style.maxWidth = '90%';
+                    img.style.maxHeight = '145mm';
+                    img.style.height = 'auto';
+                    img.style.objectFit = 'contain';
+                }
+            }
+            await doiAnhPdfTaiXong(template);
+        }
+
+        function thietLapKhungPDF(template) {
+            template.style.display = 'block';
+            template.style.position = 'relative';
+            template.style.width = '165mm';
+            template.style.maxWidth = '165mm';
+            template.style.margin = '0';
+            template.style.padding = '0';
+            template.style.boxSizing = 'border-box';
+            template.style.overflow = 'visible';
+            template.style.background = '#ffffff';
+            template.querySelectorAll('.pdf-table').forEach(tbl => {
+                tbl.style.width = '100%';
+                tbl.style.maxWidth = '100%';
+                tbl.style.tableLayout = 'fixed';
+                tbl.style.borderCollapse = 'collapse';
+                tbl.style.boxSizing = 'border-box';
+            });
+        }
+
+        function hienDungMauPDF(templateId) {
+            ['pdf-template-ba','pdf-template-lt'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = (id === templateId) ? 'block' : 'none';
+            });
+        }
+
+        function thucHienExportPDF(templateId, fileName) {
+            const template = document.getElementById(templateId);
+            hienDungMauPDF(templateId);
+            return thucHienExportPDFElement(template, fileName, false);
+        }
+
+        function thucHienExportPDFElement(template, fileName, laTongHop = false) {
+            document.getElementById("pdf-loader").style.display = "flex"; 
+            document.body.classList.add('dang-xuat-pdf');
+            const container = document.getElementById("pdf-export-container");
+
             window.scrollTo(0, 0);
 
-            // Kéo khung in ra để trình duyệt render
-            container.style.display = "block"; 
-            document.getElementById('pdf-template-ba').style.display = (templateId === 'pdf-template-ba') ? 'block' : 'none';
-            document.getElementById('pdf-template-dt').style.display = (templateId === 'pdf-template-dt') ? 'block' : 'none';
-            document.getElementById('pdf-template-lt').style.display = (templateId === 'pdf-template-lt') ? 'block' : 'none';
+            container.style.display = "block";
+            container.style.position = "fixed";
+            container.style.left = "0";
+            container.style.top = "0";
+            container.style.width = "165mm";
+            container.style.maxWidth = "165mm";
+            container.style.background = "#ffffff";
+            container.style.opacity = "1";
+            container.style.pointerEvents = "none";
+            container.style.overflow = "visible";
+            container.style.zIndex = "9990";
+
+            if(laTongHop) {
+                ['pdf-template-ba','pdf-template-lt'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.style.display = 'none';
+                });
+            }
+
+            thietLapKhungPDF(template);
 
             let opt = {
-                margin:       [15, 15, 15, 15], // Căn lề trên, trái, dưới, phải (mm)
+                margin:       [10, 14, 10, 14],
                 filename:     fileName,
-                image:        { type: 'jpeg', quality: 1 },
+                image:        { type: 'jpeg', quality: 0.88 },
                 html2canvas:  { 
-                    scale: 2, 
+                    scale: 1,
                     useCORS: true, 
+                    allowTaint: true,
                     letterRendering: true, 
-                    scrollY: 0, // Bắt buộc chụp từ tọa độ Y=0
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowX: 0,
                     windowY: 0,
-                    backgroundColor: '#ffffff' // Phủ nền trắng tinh để không bị lỗi xuyên thấu
+                    backgroundColor: '#ffffff'
                 }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                pagebreak:    { mode: ['css', 'legacy'], avoid: ['.pdf-header', '.pdf-title'] },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
             };
 
-            // Bước 3: Đợi 800ms để DOM vẽ xong dữ liệu rồi mới "Chụp" thành PDF
-            setTimeout(() => {
-                // Nhắm thẳng vào ID của Template con thay vì Container mẹ
-                html2pdf().set(opt).from(template).save().then(() => {
-                    // Trả lại hiện trạng cũ sau khi xuất thành công
-                    container.style.display = "none";
-                    document.getElementById("pdf-loader").style.display = "none";
-                }).catch(err => {
-                    console.error("Lỗi xuất PDF:", err);
-                    alert("❌ Đã có lỗi xảy ra trong quá trình kết xuất PDF!");
-                    container.style.display = "none";
-                    document.getElementById("pdf-loader").style.display = "none";
-                });
-            }, 800); 
+            return new Promise(resolve => {
+                setTimeout(async () => {
+                    try {
+                        await doiAnhPdfTaiXong(template);
+                        await html2pdf().set(opt).from(template).save();
+                        container.style.display = "none";
+                        document.getElementById("pdf-loader").style.display = "none";
+                        document.body.classList.remove('dang-xuat-pdf');
+                        resolve(true);
+                    } catch(err) {
+                        console.warn("Lỗi xuất PDF lần 1, tự nén ảnh mạnh hơn rồi xuất lại:", err);
+                        try {
+                            await giamAnhTrongTemplateNeuCan(template);
+                            opt.image.quality = 0.78;
+                            opt.html2canvas.scale = 0.9;
+                            await html2pdf().set(opt).from(template).save();
+                            container.style.display = "none";
+                            document.getElementById("pdf-loader").style.display = "none";
+                            document.body.classList.remove('dang-xuat-pdf');
+                            resolve(true);
+                        } catch(err2) {
+                            console.error("Lỗi xuất PDF sau khi đã nén ảnh:", err2);
+                            alert("❌ Ảnh vẫn quá nặng để xuất PDF. Ông thử xóa ảnh đó, chụp/cắt lại gọn hơn rồi dán lại. Các chức năng khác không bị ảnh hưởng.");
+                            container.style.display = "none";
+                            document.getElementById("pdf-loader").style.display = "none";
+                            document.body.classList.remove('dang-xuat-pdf');
+                            resolve(false);
+                        }
+                    }
+                }, 500);
+            });
         }

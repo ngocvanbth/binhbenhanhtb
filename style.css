@@ -74,6 +74,15 @@
         .theory-help { background: #f0f9ff; border-left: 5px solid var(--primary-color); padding: 14px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 15px; line-height: 1.5; color: #0f172a; }
         .theory-help strong { color: var(--primary-color); }
         .theory-section-title { display: flex; align-items: center; gap: 8px; color: var(--primary-color); font-weight: 900; margin: 0 0 10px 0; font-size: 18px; }
+        .theory-title-text { flex: 1; }
+        .btn-edit-theory-title {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 999px; border: 1px solid #bae6fd;
+            background: #f0f9ff; color: #0284c7; cursor: pointer;
+            font-size: 16px; line-height: 1; padding: 0; flex: 0 0 auto;
+            transition: all 0.15s ease;
+        }
+        .btn-edit-theory-title:hover { background: #0284c7; color: white; transform: translateY(-1px); }
         .row-lythuyet { flex-direction: column; }
         .row-lythuyet .lt-title-input { font-weight: 800; color: var(--primary-color); }
         .slide-theory-topic { color: #dc2626; text-transform: uppercase; font-weight: 900; }
@@ -169,9 +178,9 @@
         ========================================= */
         #pdf-export-container { 
             display: none; 
-            width: 210mm; 
-            min-height: 297mm; 
-            padding: 15mm 20mm; 
+            width: 165mm; 
+            min-height: auto; 
+            padding: 0; 
             background: white; 
             color: black; 
             font-family: 'Times New Roman', Times, serif; 
@@ -180,18 +189,41 @@
             left: 0; 
             z-index: 9990; 
             box-sizing: border-box; 
+            overflow: visible;
+            pointer-events: none;
         }
-        .pdf-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-        .pdf-header-left { text-align: center; font-weight: bold; font-size: 14px; }
-        .pdf-header-right { text-align: center; font-weight: bold; font-size: 14px; }
-        .pdf-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; text-transform: uppercase; }
-        .pdf-section { margin-bottom: 15px; font-size: 15px; line-height: 1.5; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 8px; text-align: left; }
+        #pdf-export-container > div {
+            width: 165mm;
+            max-width: 165mm;
+            box-sizing: border-box;
+            background: #ffffff;
+            color: #000000;
+            overflow: visible;
+            padding: 0;
+            margin: 0;
+        }
+        .pdf-header { display: flex; justify-content: space-between; gap: 8mm; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 12px; box-sizing: border-box; width: 100%; }
+        .pdf-header-left, .pdf-header-right { width: 50%; text-align: center; font-weight: bold; font-size: 12.5px; box-sizing: border-box; }
+        .pdf-title { text-align: center; font-size: 17px; font-weight: bold; margin: 12px 0; text-transform: uppercase; }
+        .pdf-section { margin-bottom: 9px; font-size: 12.8px; line-height: 1.36; box-sizing: border-box; max-width: 100%; width: 100%; overflow-wrap: anywhere; word-break: break-word; }
+        .pdf-table { width: 100%; max-width: 100%; border-collapse: collapse; margin-top: 8px; margin-right: 0; font-size: 10.2px; table-layout: fixed; box-sizing: border-box; border: 1px solid #333; }
+        .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 3px 4px; text-align: left; vertical-align: top; box-sizing: border-box; overflow-wrap: anywhere; word-break: break-word; white-space: normal; max-width: none; }
+        .pdf-table th:last-child, .pdf-table td:last-child { border-right: 1px solid #333 !important; }
         .pdf-table th { text-align: center; font-weight: bold; background-color: #f2f2f2; }
-        .avoid-break { page-break-inside: avoid; }
-        .pdf-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.04); font-weight: bold; z-index: 0; pointer-events: none; white-space: nowrap;}
-        .pdf-text-block { white-space: pre-wrap; word-break: break-word; display: inline-block; width: 100%; vertical-align: top;}
+        .pdf-table tr { page-break-inside: avoid; break-inside: avoid; }
+        .avoid-break { page-break-inside: avoid; break-inside: avoid; }
+        .pdf-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 60px; color: rgba(0,0,0,0.032); font-weight: bold; z-index: 0; pointer-events: none; white-space: nowrap;}
+        .pdf-text-block { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; display: inline; max-width: 100%; vertical-align: baseline; box-sizing: border-box;}
+        #pdf-ba-images, #pdf-dt-images { width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible; }
+        #pdf-ba-images img, #pdf-dt-images img { max-width: 94% !important; height: auto !important; max-height: 170mm !important; object-fit: contain; box-sizing: border-box; }
+        .pdf-combo-section { page-break-after: always; break-after: page; }
+        .pdf-combo-section:last-child { page-break-after: auto; break-after: auto; }
+        @page { size: A4 portrait; margin: 10mm 12mm; }
+        @media print {
+            #pdf-export-container, #pdf-export-container > div { width: 165mm !important; max-width: 165mm !important; overflow: visible !important; left: 0 !important; }
+            .pdf-table { table-layout: fixed !important; width: 100% !important; max-width: 100% !important; }
+            .pdf-table th, .pdf-table td { overflow-wrap: anywhere !important; word-break: break-word !important; }
+        }
 
         /* Hiệu ứng Màn hình Loading khi xuất file */
         #pdf-loader { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
